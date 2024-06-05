@@ -1,0 +1,13 @@
+{
+  "name": "go-cipher-tool",
+  "outputfilename": "go-cipher-tool",
+  "frontend:install": "npm install",
+  "frontend:build": "npm run build",
+  "frontend:dev:watcher": "npm run dev",
+  "frontend:dev:serverUrl": "auto",
+  "assetdir": "./frontend/dist",
+  "author": {
+    "name": "Hatchibombotar",
+    "email": "72224591+Hatchibombotar@users.noreply.github.com"
+  }
+}
