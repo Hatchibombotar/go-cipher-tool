@@ -9,107 +9,245 @@ import {
 } from "~/components/ui/card"
 import { BarChart } from "~/components/ui/charts";
 
-import { For, createEffect, createSignal } from "solid-js";
-import { CountMonograms, DecodeCaesarCipher, Format } from "../wailsjs/go/main/App";
+import { For , createEffect, createSignal } from "solid-js";
+import { CountMonograms, DecodeCaesarCipher, Format, MonogramIndexOfCoincidence } from "../wailsjs/go/main/App";
 import { ChartData, ChartOptions } from "chart.js";
 import { FormatOptions, FormattingMode } from "./models";
+import { createStore } from "solid-js/store";
+import { FaSolidXmark } from 'solid-icons/fa'
 
-function panic(err: Error | string): never {
+function panic(err: Error | string = "error"): never {
   throw err
 }
 
-const blockdata = {
-  
+type Store = {
+  text: string,
+  blocks: BlockData[],
 }
 
-function App() {
-  const [text, setText] = createSignal("Hello")
-  const blocks = [
-    {
-      "type": "frequency_analysis",
-    },
-    {
-      "type": "caesar_cipher",
-    },
-    {
-      "type": "frequency_analysis",
-    },
-    {
-      "type": "format",
-    },
-    {
-      "type": "output",
+type BlockData = (
+  ({
+    type: "frequency_analysis"
+  } | {
+    type: "caesar_cipher",
+    data: {
+      steps: number
     }
-  ]
-  let [dataStack, setDataStack] = createSignal([text()])
-
-  const setInputText = (text: string) => {
-    text = text.toLowerCase()
-    setText(text)
-    setDataStack([text])
+  } | {
+    type: "format",
+    data: {
+      case: FormattingMode
+    }
+  } | {
+    type: "output"
+  }) & {
+    input?: number
   }
+)
 
-  createEffect(() => {
-    console.log(dataStack())
+
+function App() {
+  const [store, setStore] = createStore<Store>({
+    text: "Hello, World!",
+    blocks: [
+      {
+        type: "format",
+        data: {
+          case: FormattingMode.LowerCaseFormatting
+        }
+      },
+      {
+        type: "frequency_analysis"
+      },
+      {
+        type: "caesar_cipher",
+        data: {
+          steps: 0
+        }
+      },
+      {
+        type: "frequency_analysis",
+      },
+      {
+        type: "format",
+        data: {
+          case: FormattingMode.SentenceCaseFormatting
+        }
+      },
+      {
+        type: "output",
+      }
+    ],
   })
 
-  return (
-    <div class="p-6 flex flex-col gap-4 md:grid grid-cols-2 bg-white">
-      <InputNode onChange={setInputText} />
-      <For each={blocks}>{(node) => {
-        let index = dataStack().length - 1
-        const data = () => dataStack().at(index) ?? ""
+  const [dataStack, setDataStack] = createSignal<string[]>([])
 
-        if (node.type === "frequency_analysis") {
-          return <FrequencyAnalysis text={data} />
+  let processDebounceTimer: number | null;
 
-        } else if (node.type === "caesar_cipher") {
-          index += 1
-          setDataStack([...dataStack(), dataStack().at(index - 1) ?? ""])
+  createEffect(() => {
+    // This is really disgusting, there should be another way of doing this.
+    JSON.stringify(store.text)
+    JSON.stringify(store.blocks)
 
-          const onChange = async (n: number) => {
-            const prevDataStack = [...dataStack()]
-            prevDataStack[index] = await DecodeCaesarCipher(dataStack().at(index - 1) ?? panic("error"), n)
-            setDataStack(prevDataStack)
-          }
+    if (processDebounceTimer) clearTimeout(processDebounceTimer)
+    processDebounceTimer = setTimeout(() => {
+      processData()
+      processDebounceTimer = null
+    }, 100) as unknown as number
+  })
 
-          onChange(0)
-          return <CaesarCipher onChange={(n) => { onChange(n) }} />
-        } else if (node.type === "format") {
-          index += 1
-          setDataStack([...dataStack(), dataStack().at(index - 1) ?? ""])
+  processData()
 
-          const onChange = async (settings: FormatNodeSettings) => {
-            const options: FormatOptions = {
-              CaseMode: settings.case,
-              RemoveUnknown: false
+  async function processData() {
+    let datastack = [
+      store.text
+    ]
+    for (const [blockindex, block] of store.blocks.entries()) {
+      if (block.type === "caesar_cipher") {
+        datastack.push(
+          await DecodeCaesarCipher(datastack.at(-1) ?? panic(), block.data.steps)
+        )
+      } else if (block.type === "format") {
+        const options: FormatOptions = {
+          CaseMode: block.data.case,
+          RemoveUnknown: false
+        }
+
+        datastack.push(
+          await Format(datastack.at(-1) ?? panic(), options)
+        )
+      }
+      console.log(datastack.length)
+      setStore("blocks", blockindex, {
+        ...block,
+        input: datastack.length - 1
+      })
+    }
+    console.log(JSON.stringify(store, null, 4))
+    setDataStack(datastack)
+  }
+
+  const blockdata: Record<string, { title: string, description: string, component: (block: BlockData, data: () => string, index: () => number) => any }> = {
+    frequency_analysis: {
+      title: "Frequency Analysis",
+      description: "Count the frequency of Monograms",
+      component: (block, data) => {
+        return <FrequencyAnalysis text={data} />
+      }
+    },
+    index_of_coincidence: {
+      title: "Index of Coincidence",
+      description: "Calculate the index of coinidence for the input text. Typical for English: 1.75",
+      component: (block, data) => {
+        return <IndexOfCoincidence text={data} />
+      }
+    },
+    caesar_cipher: {
+      title: "Caesar Cipher",
+      description: "Encode/Decode",
+      component(block, data, index) {
+        return <CaesarCipher onChange={(n) => {
+          setStore("blocks", index(), {
+            type: "caesar_cipher",
+            data: {
+              steps: n
             }
-
-            const prevDataStack = [...dataStack()]
-            prevDataStack[index] = await Format(dataStack().at(index - 1) ?? panic("error"),  options)
-            setDataStack(prevDataStack)
-          }
-          onChange({
-            case: FormattingMode.UnchangedCaseFormatting
           })
-          return <FormatNode onChange={(settings) => { onChange(settings) }} />
+        }} />
+      },
+    },
+    format: {
+      title: "Format",
+      description: "Format Text",
+      component(block, data, index) {
+        return <FormatNode onChange={(settings) => {
+          setStore("blocks", index(), {
+            type: "format",
+            data: {
+              case: settings.case
+            }
+          })
+        }} />
+      },
+    },
+    output: {
+      title: "Output",
+      description: "Decoded Text",
+      component(block, data, index) {
+        return <Output text={data} />
+      },
+    }
+  }
 
-        } else if (node.type === "output") {
+  return (
+    <div class="p-6 flex flex-col gap-4 md:grid grid-cols-2 xl:grid-cols-3 bg-white">
+      <InputNode onChange={(text) => setStore("text", text)} />
+      <For each={store.blocks}>{(node, blockIndex) => {
+        const data = () => dataStack().at(node.input ?? 0) ?? ""
 
-          return <Output text={data} />
-
-        } else {
-          return
+        if (node.type in blockdata) {
+          const thisblock = blockdata[node.type]
+          return <Card>
+            <CardHeader>
+              <div class="flex gap-1">
+                <CardTitle>{thisblock.title}</CardTitle>
+                <button type="button" class="ml-auto p-1 hover:bg-slate-200 rounded-sm" onClick={() => {
+                  const oldIndex = blockIndex()
+                  const newIndex = Math.max(oldIndex - 1, 0)
+                  const new_store_data = store.blocks.filter((_, index) => index != oldIndex)
+                  new_store_data.splice(newIndex, 0, node)
+                  setStore("blocks", new_store_data)
+                }}>
+                  {/* <FaSolidAngleUp> </FaSolidAngleUp> */}
+                  ^
+                </button>
+                <button type="button" class="p-1 hover:bg-slate-200 rounded-sm" onClick={() => {
+                  const oldIndex = blockIndex()
+                  const newIndex = Math.min(oldIndex + 1, store.blocks.length - 1)
+                  const new_store_data = store.blocks.filter((_, index) => index != oldIndex)
+                  new_store_data.splice(newIndex, 0, node)
+                  setStore("blocks", new_store_data)
+                }}>
+                  {/* <FaSolidAngleDown></FaSolidAngleDown> */}
+                  v
+                </button>
+                <button type="button" class="p-1 hover:bg-slate-200 rounded-sm" onClick={() => {
+                  setStore("blocks", store.blocks.filter((_, index) => index != blockIndex()))
+                }}>
+                  {/* <FaSolidXmark class="" size={10} /> */}
+                  x
+                </button>
+              </div>
+              <CardDescription>{thisblock.description}</CardDescription>
+            </CardHeader>
+            <CardContent>
+              {thisblock.component(node, data, blockIndex)}
+            </CardContent>
+          </Card>
         }
       }}
       </For>
 
-      <Card class="p-2 flex flex-row gap-2">
-        <For each={[0, 1, 2]}>{() =>
-          <div class="group relative w-12">
+      <Card class="p-2 flex flex-row gap-2 h-min">
+        <For each={Object.entries(blockdata)}>{([type, data]) =>
+          <div class="group relative w-12" onClick={() => {
+            const object: Partial<BlockData> = {
+              type: type as BlockData["type"],
+            }
+            if (object.type == "caesar_cipher") {
+              object.data = {
+                steps: 0
+              }
+            } else if (object.type == "format") {
+              object.data = {
+                case: FormattingMode.UnchangedCaseFormatting
+              }
+            }
+            setStore("blocks", store.blocks.length, object)
+          }}>
             <div class="border hover:bg-slate-100 cursor-pointer rounded-lg h-12 w-12"></div>
             <div class="hidden group-hover:flex pt-3 absolute left-full ml-2 top-0 border z-20 bg-slate-200 p-2 rounded-lg h-12 w-auto">
-              <p class="text-sm whitespace-nowrap font-semibold">Frequency Analysis</p>
+              <p class="text-sm whitespace-nowrap font-semibold">{data.title}</p>
             </div>
           </div>
         }</For>
@@ -190,58 +328,53 @@ function FrequencyAnalysis({ text }: { text: () => string }) {
 
   }
   return <div class="">
-    <Card>
-      <CardHeader>
-        <CardTitle>Frequency Analysis</CardTitle>
-        <CardDescription>Count the frequency of Monograms</CardDescription>
-      </CardHeader>
-      <CardContent>
-        <div class="h-96">
-          <BarChart data={chartData()} options={chartOptions} />
-        </div>
-      </CardContent>
-    </Card>
+    <div class="h-96">
+      <BarChart data={chartData()} options={chartOptions} />
+    </div>
   </div>
 }
 
+
+function IndexOfCoincidence({ text }: { text: () => string }) {
+  const [ioc, setIoc] = createSignal(0)
+  createEffect(async () => {
+    setIoc(
+      await MonogramIndexOfCoincidence(text())
+    )
+  })
+
+  return <div class="">
+    <div class="h-96">
+      <p class="font-semibold text-lg">
+        {ioc()}
+      </p>
+    </div>
+  </div>
+}
+
+
 function Output({ text }: { text: () => string }) {
   return <div class="">
-    <Card>
-      <CardHeader>
-        <CardTitle>Output</CardTitle>
-        <CardDescription>Decoded Text</CardDescription>
-      </CardHeader>
-      <CardContent>
-        <div class="">
-          <p>{text()}</p>
-        </div>
-      </CardContent>
-    </Card>
+    <div class="">
+      <p>{text()}</p>
+    </div>
   </div>
 }
 function CaesarCipher({ onChange }: { onChange: (steps: number) => void }) {
   const [steps, setSteps] = createSignal(0)
   return <div class="">
-    <Card>
-      <CardHeader>
-        <CardTitle>Caesar Cipher</CardTitle>
-        <CardDescription>Encode/Decode</CardDescription>
-      </CardHeader>
-      <CardContent>
-        <div class="flex flex-col">
-          <p class="ml-auto mr-0 mb-1">{steps()}</p>
-          <Slider defaultValue={[0]} step={1} minValue={-26} maxValue={26} onChange={(e) => {
-            onChange(e[0])
-            setSteps(e[0])
-          }}>
-            <SliderTrack>
-              <SliderFill />
-              <SliderThumb />
-            </SliderTrack>
-          </Slider>
-        </div>
-      </CardContent>
-    </Card>
+    <div class="flex flex-col">
+      <p class="ml-auto mr-0 mb-1">{steps()}</p>
+      <Slider defaultValue={[0]} step={1} minValue={-26} maxValue={26} onChange={(e) => {
+        onChange(e[0])
+        setSteps(e[0])
+      }}>
+        <SliderTrack>
+          <SliderFill />
+          <SliderThumb />
+        </SliderTrack>
+      </Slider>
+    </div>
   </div>
 }
 
@@ -258,23 +391,15 @@ function FormatNode({ onChange }: { onChange: (settings: FormatNodeSettings) => 
   }
 
   return <div class="">
-    <Card>
-      <CardHeader>
-        <CardTitle>Format</CardTitle>
-        <CardDescription>Format Text</CardDescription>
-      </CardHeader>
-      <CardContent>
-        <select onChange={(e) => {
-          setCaseType(Number(e.currentTarget.value) as FormattingMode)
-          change()
-        }}>
-          <option value={FormattingMode.UnchangedCaseFormatting}>default</option>
-          <option value={FormattingMode.SentenceCaseFormatting}>Sentence case.</option>
-          <option value={FormattingMode.UpperCaseFormatting}>UPPER CASE</option>
-          <option value={FormattingMode.LowerCaseFormatting}>lower case</option>
-        </select>
-      </CardContent>
-    </Card>
+    <select onChange={(e) => {
+      setCaseType(Number(e.currentTarget.value) as FormattingMode)
+      change()
+    }}>
+      <option value={FormattingMode.UnchangedCaseFormatting}>default</option>
+      <option value={FormattingMode.SentenceCaseFormatting}>Sentence case.</option>
+      <option value={FormattingMode.UpperCaseFormatting}>UPPER CASE</option>
+      <option value={FormattingMode.LowerCaseFormatting}>lower case</option>
+    </select>
   </div>
 }
 

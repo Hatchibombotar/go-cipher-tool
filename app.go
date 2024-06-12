@@ -57,6 +57,11 @@ func (a *App) DecodeCaesarCipher(text string, steps int) string {
 	return decoded
 }
 
+func (a *App) MonogramIndexOfCoincidence(text string) float64 {
+	ioc := analysis.MonogramIndexOfCoincidence(text)
+	return ioc
+}
+
 func (a *App) Format(str string, options format.FormatOptions) string {
 	formatted := format.FormatString(str, &options)
 	return formatted

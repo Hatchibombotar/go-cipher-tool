@@ -9,3 +9,5 @@ export function DecodeCaesarCipher(arg1:string,arg2:number):Promise<string>;
 export function Format(arg1:string,arg2:format.FormatOptions):Promise<string>;
 
 export function Greet(arg1:string):Promise<string>;
+
+export function MonogramIndexOfCoincidence(arg1:string):Promise<number>;
