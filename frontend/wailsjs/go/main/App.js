@@ -10,6 +10,10 @@ export function DecodeCaesarCipher(arg1, arg2) {
   return window['go']['main']['App']['DecodeCaesarCipher'](arg1, arg2);
 }
 
+export function DecodeSubsitutionCipher(arg1, arg2) {
+  return window['go']['main']['App']['DecodeSubsitutionCipher'](arg1, arg2);
+}
+
 export function Format(arg1, arg2) {
   return window['go']['main']['App']['Format'](arg1, arg2);
 }

@@ -56,6 +56,10 @@ func (a *App) DecodeCaesarCipher(text string, steps int) string {
 	decoded := cipher.DecodeCaesarCipher(text, steps)
 	return decoded
 }
+func (a *App) DecodeSubsitutionCipher(text string, substitutions map[rune]rune) string {
+	decoded := cipher.SubstitutionCipher(text, substitutions)
+	return decoded
+}
 
 func (a *App) MonogramIndexOfCoincidence(text string) float64 {
 	ioc := analysis.MonogramIndexOfCoincidence(text)

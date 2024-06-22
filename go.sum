@@ -1,5 +1,3 @@
-github.com/Hatchibombotar/go-cipher v0.0.0-20240611172506-811e93af03f0 h1:HITZ1blj3DQI6fLaJLNs7kuzrvqfh3tPTAtApRh4A34=
-github.com/Hatchibombotar/go-cipher v0.0.0-20240611172506-811e93af03f0/go.mod h1:T/sKxu9pT+Hbr/2p9tsnfahmAnyKcrQrVI1zqSLKDzk=
 github.com/Hatchibombotar/go-cipher v0.0.0-20240612174131-66751afc69e9 h1:cfhgvwKdWilN5QzaiwJlnr4nVCd0BEm7mX5NsQ1s/XU=
 github.com/Hatchibombotar/go-cipher v0.0.0-20240612174131-66751afc69e9/go.mod h1:T/sKxu9pT+Hbr/2p9tsnfahmAnyKcrQrVI1zqSLKDzk=
 github.com/bep/debounce v1.2.1 h1:v67fRdBA9UQu2NhLFXrSg0Brw7CexQekrBwDMM8bzeY=
