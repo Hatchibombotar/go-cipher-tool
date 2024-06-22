@@ -35,7 +35,7 @@ func main() {
 		Frameless:         false,
 		StartHidden:       false,
 		HideWindowOnClose: false,
-		BackgroundColour:  &options.RGBA{R: 255, G: 255, B: 255, A: 255},
+		BackgroundColour:  &options.RGBA{R: 248, G: 250, B: 252, A: 255},
 		Assets:            assets,
 		Menu:              nil,
 		Logger:            nil,
@@ -53,8 +53,15 @@ func main() {
 			WebviewIsTransparent: false,
 			WindowIsTranslucent:  false,
 			DisableWindowIcon:    false,
+			IsZoomControlEnabled: true,
 			// DisableFramelessWindowDecorations: false,
 			WebviewUserDataPath: "",
+			CustomTheme: &windows.ThemeSettings{
+				LightModeBorder:           windows.RGB(255, 255, 255),
+				LightModeBorderInactive:   windows.RGB(255, 255, 255),
+				LightModeTitleBar:         windows.RGB(248, 250, 252),
+				LightModeTitleBarInactive: windows.RGB(248, 250, 252),
+			},
 			// CustomTheme: &windows.ThemeSettings{
 			// 	// Theme to use when window is active
 			// 	DarkModeTitleBar:   windows.RGB(255, 0, 0), // Red

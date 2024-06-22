@@ -7,6 +7,14 @@ import {
   CardTitle
 } from "~/components/ui/card"
 
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "~/components/ui/dialog"
+
 import { For, Setter, createEffect, createSignal } from "solid-js";
 import { DecodeCaesarCipher, Format, DecodeSubsitutionCipher } from "../wailsjs/go/main/App";
 import { FormatOptions, FormattingMode } from "./models";
@@ -222,12 +230,19 @@ function App() {
     }
   }
 
+  function confirmClear() {
+    if (confirm("Remove all blocks from the workspace? This cannot be un-done.")) {
+      setStore("blocks", [])
+    }
+  }
+
   return (
-    <div class="bg-slate-50 p-4">
-      <div class="mb-4 flex gap-2">
-        <button class="hover:bg-neutral-200 font-semibold text-sm px-2 py-1 rounded-md">Save Workspace</button>
+    <div class="bg-slate-50 p-4 min-h-screen">
+      <WorkspaceSave />
+      <div class="mb-4 -mt-1 flex gap-2">
+        <button class="hover:bg-neutral-200 font-semibold text-sm px-2 py-1 rounded-md" onClick={() => setSaveMenuOpen(true)}>Save Workspace</button>
         <button class="hover:bg-neutral-200 font-semibold text-sm px-2 py-1 rounded-md">Load Workspace</button>
-        <button class="hover:bg-neutral-200 font-semibold text-sm px-2 py-1 rounded-md">Clear Workspace</button>
+        <button class="hover:bg-neutral-200 font-semibold text-sm px-2 py-1 rounded-md" onClick={confirmClear}>Clear Workspace</button>
       </div>
       <div class="flex flex-col gap-4 md:grid grid-cols-2 xl:grid-cols-3">
         <InputNode onChange={(text) => setStore("text", text)} />
@@ -261,7 +276,7 @@ function App() {
                   <button type="button" class="p-1 hover:bg-slate-200 rounded-sm" onClick={() => {
                     setStore("blocks", store.blocks.filter((_, index) => index != blockIndex()))
                   }}>
-                    <FaSolidXmark  />
+                    <FaSolidXmark />
                   </button>
                 </div>
                 <CardDescription>{thisblock.description}</CardDescription>
@@ -304,8 +319,34 @@ function App() {
   );
 }
 
+const [saveMenuOpen, setSaveMenuOpen] = createSignal(false)
+function WorkspaceSave() {
+  return <div>
+    <Dialog open={saveMenuOpen()} defaultOpen={saveMenuOpen()} onOpenChange={(s) => setSaveMenuOpen(s)}>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Save Workspace</DialogTitle>
+          <DialogDescription class="flex flex-col gap-2 pt-2">
+            <span>New Workspace</span>
+            <div class="flex gap-2 w-full">
+              <input class="border py-2 px-2 rounded-md w-full text-black" type="text" placeholder="Untitled Workspace"></input>
+              <button class="text-white bg-black rounded-md px-4 py-2">Save</button>
+            </div>
+            <span>Existing Workspaces</span>
+            <div class="border py-2 px-2 rounded-md hover:bg-neutral-100 cursor-pointer">
+              <span class="text-black">
+                Untitled Workspace
+              </span>
+            </div>
+          </DialogDescription>
+        </DialogHeader>
+      </DialogContent>
+    </Dialog>
+  </div>
+}
+
 function InputNode({ onChange }: { onChange: (text: string) => void }) {
-  return <div class="">
+  return <div class="flex flex-col">
     <Card>
       <CardHeader>
         <CardTitle>Input</CardTitle>
