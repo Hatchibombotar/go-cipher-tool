@@ -70,3 +70,11 @@ func (a *App) Format(str string, options format.FormatOptions) string {
 	formatted := format.FormatString(str, &options)
 	return formatted
 }
+
+func (a *App) DecodePolybiusCipher(encoded string, key string) (string, error) {
+	plaintext, err := cipher.DecodePolybiusCipher(encoded, key)
+	if err != nil {
+		return "", err
+	}
+	return plaintext, nil
+}

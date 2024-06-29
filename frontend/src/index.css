@@ -112,3 +112,29 @@
     @apply px-4;
   }
 }
+
+.custom-polybius-table {
+  tr {
+    height: 30px;
+  }
+  th, td {
+    text-align: center;
+    width: 30px;
+  }
+  th {
+    @apply font-medium
+  }
+  td {
+    @apply border
+  }
+
+  td > input {
+    height: 30px;
+    width: 30px;
+    text-align: center;
+  }
+}
+
+:root {
+  @apply bg-slate-50
+}

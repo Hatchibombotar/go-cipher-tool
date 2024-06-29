@@ -5,4 +5,17 @@ export function panic(err: Error | string = "error"): never {
   throw err
 }
 
+export function assertError(err: any) {
+  if (typeof err == "string") {
+    return new Error(err)
+  } else if (err instanceof Error) {
+    return err
+  } else {
+    console.error(err)
+    return new Error("Unexpected error type, view error in console.", {
+      cause: err
+    })
+  }
+}
+
 export const alphabet = 'abcdefghijklmnopqrstuvwxyz'.split('');

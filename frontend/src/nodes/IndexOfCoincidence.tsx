@@ -1,6 +1,10 @@
 import { createEffect, createSignal } from "solid-js";
 import { MonogramIndexOfCoincidence } from "../../wailsjs/go/main/App";
 
+export type IndexOfCoincidenceNodeData = {
+  type: "index_of_coincidence"
+}
+
 export function IndexOfCoincidence({ text }: { text: () => string; }) {
   const [ioc, setIoc] = createSignal(0);
   createEffect(async () => {
