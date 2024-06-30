@@ -169,19 +169,8 @@ function App() {
               const object: Partial<Block> = {
                 type: type as BlockType,
               }
-              if (object.type == "caesar_cipher") {
-                object.data = {
-                  steps: 0
-                }
-              } else if (object.type == "format") {
-                object.data = {
-                  case: FormattingMode.UnchangedCaseFormatting,
-                  removeUnknown: false
-                }
-              } else if (object.type == "index_of_coincidence") {
-                object.data = {
-                  ioc: 0
-                }
+              if (data.init) {
+                (object as any).data = data.init()
               }
               setStore("blocks", store.blocks.length, object)
             }}>

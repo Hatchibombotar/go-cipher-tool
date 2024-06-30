@@ -29,7 +29,7 @@ export type Block = FrequencyAnalysisBlockData |
   HighlightBlockData |
   IndexOfCoincidenceBlockData
 
-export const getBlockData: (store: Store, setStore: any) => Record<BlockData["type"], { title: string, description: string, component: (block: BlockData, data: () => string, index: () => number) => any, process?: (block: BlockData, previous: string, index: number) => Promise<string> }> = (_store, setStore) => ({
+export const getBlockData: (store: Store, setStore: any) => Record<BlockData["type"], { title: string, description: string, component: (block: BlockData, data: () => string, index: () => number) => any, process?: (block: BlockData, previous: string, index: number) => Promise<string>, init?: () => any }> = (_store, setStore) => ({
   frequency_analysis: {
     title: "Frequency Analysis",
     description: "Count the frequency of Monograms",
@@ -54,6 +54,11 @@ export const getBlockData: (store: Store, setStore: any) => Record<BlockData["ty
 
       return previous
     },
+    init() {
+      return {
+        ioc: 0
+      }
+    }
   },
   caesar_cipher: {
     title: "Caesar Cipher",
@@ -70,6 +75,11 @@ export const getBlockData: (store: Store, setStore: any) => Record<BlockData["ty
     },
     process(block, previous) {
       return DecodeCaesarCipher(previous, (block as CaesarCipherBlockData).data.steps)
+    },
+    init() {
+      return {
+        steps: 0
+      }
     }
   },
   substitution_cipher: {
@@ -116,6 +126,12 @@ export const getBlockData: (store: Store, setStore: any) => Record<BlockData["ty
 
       return Format(previous, options)
     },
+    init() {
+      return {
+        case: FormattingMode.UnchangedCaseFormatting,
+        removeUnknown: false
+      }
+    }
   },
   output: {
     title: "Output",
