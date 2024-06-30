@@ -2,8 +2,9 @@ import { Switch, SwitchControl, SwitchThumb, SwitchLabel } from "~/components/ui
 import { For, createEffect, createSignal } from "solid-js";
 import { CountMonograms } from "../../wailsjs/go/main/App";
 import { alphabet, panic, corpus_data } from "../utils";
+import { BlockData } from "~/blocks";
 
-export type PolybiusCipherNodeData = {
+export interface PolybiusCipherBlockData extends BlockData {
   type: "polybius_cipher",
   data: {
     key: string

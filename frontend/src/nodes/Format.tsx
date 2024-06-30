@@ -1,8 +1,9 @@
 import { Switch, SwitchControl, SwitchThumb, SwitchLabel } from "~/components/ui/switch"
 import { createSignal } from "solid-js"
 import { FormattingMode } from "~/models"
+import { BlockData } from "~/blocks"
 
-export type FormatNodeData = {
+export interface FormatBlockData extends BlockData {
     type: "format",
     data: {
         case: FormattingMode,

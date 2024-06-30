@@ -1,7 +1,8 @@
 import { createEffect, createSignal } from "solid-js";
 import { MonogramIndexOfCoincidence } from "../../wailsjs/go/main/App";
+import { BlockData } from "~/blocks";
 
-export type IndexOfCoincidenceNodeData = {
+export interface IndexOfCoincidenceBlockData extends BlockData {
   type: "index_of_coincidence"
 }
 

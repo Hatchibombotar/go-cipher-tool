@@ -1,55 +1,12 @@
 import { Textarea } from "~/components/ui/textarea"
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle
-} from "~/components/ui/card"
-
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "~/components/ui/dialog"
-
-import { For, type Setter, createEffect, createSignal, ErrorBoundary, Show } from "solid-js";
-import { DecodeCaesarCipher, Format, DecodeSubsitutionCipher, DecodePolybiusCipher } from "../wailsjs/go/main/App";
-import { FormatOptions, FormattingMode } from "./models";
-import { SetStoreFunction, createStore } from "solid-js/store";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "~/components/ui/card"
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "~/components/ui/dialog"
+import { For, createEffect, createSignal, ErrorBoundary, Show } from "solid-js";
+import { FormattingMode } from "./models";
+import { createStore } from "solid-js/store";
 import { FaSolidAngleUp, FaSolidXmark, FaSolidAngleDown, FaSolidExclamation } from 'solid-icons/fa'
-import { FormatNode, FormatNodeData } from "./nodes/Format";
-import { Highlight, HighlightNodeData } from "./nodes/Highlight";
-import { CaesarCipher, CaesarCipherNodeData } from "./nodes/CaesarCipher";
-import { Output, OutputNodeData } from "./nodes/Output";
-import { IndexOfCoincidence, IndexOfCoincidenceNodeData } from "./nodes/IndexOfCoincidence";
-import { FrequencyAnalysis, FrequencyAnalysisNodeData } from "./nodes/FrequencyAnalysis";
-import { SubstitutionCipher, SubstitutionCipherNodeData } from "./nodes/SubstitutionCipher";
-import { panic, assertError } from "./utils";
-import { PolybiusCipher, PolybiusCipherNodeData } from "./nodes/Polybius";
-
-type Store = {
-  text: string,
-  blocks: BlockData[],
-}
-
-type BlockData = (
-  (
-    FrequencyAnalysisNodeData |
-    CaesarCipherNodeData |
-    SubstitutionCipherNodeData |
-    FormatNodeData |
-    OutputNodeData |
-    PolybiusCipherNodeData |
-    HighlightNodeData |
-    IndexOfCoincidenceNodeData
-  ) & {
-    input?: number,
-    error?: Error,
-  }
-)
+import { Store } from "./utils";
+import { Block, getBlockData, processData } from "./blocks";
 
 const example_workspace_caesar: Store = {
   text: "Hello, World!",
@@ -100,7 +57,6 @@ const example_workspace_substitution: Store = {
   ]
 }
 
-
 function App() {
   const [store, setStore] = createStore<Store>(example_workspace_caesar)
 
@@ -108,6 +64,7 @@ function App() {
 
   let processDebounceTimer: number | null;
 
+  const blockdata = getBlockData(store, setStore)
   createEffect(() => {
     // This is really disgusting, there should be another way of doing this.
     JSON.stringify(store.text)
@@ -119,156 +76,6 @@ function App() {
       processDebounceTimer = null
     }, 100) as unknown as number
   })
-
-
-  const blockdata: Record<BlockData["type"], { title: string, description: string, component: (block: BlockData, data: () => string, index: () => number) => any, process?: (block: BlockData, previous: string) => Promise<string> }> = {
-    frequency_analysis: {
-      title: "Frequency Analysis",
-      description: "Count the frequency of Monograms",
-      component: (block, data) => {
-        return <FrequencyAnalysis text={data} />
-      }
-    },
-    index_of_coincidence: {
-      title: "Index of Coincidence",
-      description: "Calculate the index of coinidence for the input text. Typical for English: 1.75",
-      component: (block, data) => {
-        return <IndexOfCoincidence text={data} />
-      }
-    },
-    caesar_cipher: {
-      title: "Caesar Cipher",
-      description: "Encode/Decode",
-      component(block, data, index) {
-        return <CaesarCipher onChange={(n) => {
-          setStore("blocks", index(), {
-            type: "caesar_cipher",
-            data: {
-              steps: n
-            }
-          })
-        }} />
-      },
-      process(block, previous) {
-        return DecodeCaesarCipher(previous, (block as CaesarCipherNodeData).data.steps)
-      }
-    },
-    substitution_cipher: {
-      title: "Substitution Cipher",
-      description: "Encode/Decode",
-      component(block, data, index) {
-        return <SubstitutionCipher onChange={(substitution) => {
-          setStore("blocks", index(), {
-            type: "substitution_cipher",
-            data: {
-              subsitution: substitution
-            }
-          })
-        }}
-          text={data}
-        />
-      },
-      process(block, previous) {
-        const subsitution_with_runes = Object.fromEntries(
-          Object.entries((block as SubstitutionCipherNodeData).data.subsitution).map(([k, v]) => [k.charCodeAt(0), v.charCodeAt(0)])
-        )
-        return DecodeSubsitutionCipher(previous, subsitution_with_runes)
-      },
-    },
-    format: {
-      title: "Format",
-      description: "Format Text",
-      component(block, data, index) {
-        return <FormatNode onChange={(settings) => {
-          setStore("blocks", index(), {
-            type: "format",
-            data: {
-              case: settings.case,
-              removeUnknown: settings.removeUnknown
-            }
-          })
-        }} />
-      },
-      process(block, previous) {
-        const options: FormatOptions = {
-          CaseMode: (block as FormatNodeData).data.case,
-          RemoveUnknown: (block as FormatNodeData).data.removeUnknown
-        }
-
-        return Format(previous, options)
-      },
-    },
-    output: {
-      title: "Output",
-      description: "Decoded Text",
-      component(block, data, index) {
-        return <Output text={data} />
-      },
-    },
-    highlight: {
-      title: "Highlight",
-      description: "Highlight Text",
-      component(block, data, index) {
-        return <Highlight text={data} />
-      },
-    },
-    polybius_cipher: {
-      title: "Polybius Cipher",
-      description: "Decode",
-      component(block, data, index) {
-        return <PolybiusCipher text={data} onChange={(key) => {
-          setStore("blocks", index(), {
-            type: "polybius_cipher",
-            data: {
-              "key": key.join("")
-            }
-          })
-        }} />
-      },
-      process: (block, input) => {
-        console.log("hello?")
-        return DecodePolybiusCipher(input, (block as PolybiusCipherNodeData).data.key)
-      }
-    }
-  }
-
-  async function processData(store: Store, setStore: SetStoreFunction<Store>, setDataStack: Setter<string[]>) {
-    let datastack = [
-      store.text
-    ]
-    for (const [blockindex, block] of store.blocks.entries()) {
-      const block_data = blockdata[block.type]
-      if (block_data && block_data.process) {
-        const result = await block_data.process(
-          block,
-          datastack.at(-1) ?? panic()
-        ).catch(
-          assertError
-        )
-
-        if (result instanceof Error) {
-          setStore("blocks", blockindex, {
-            ...block,
-            error: result,
-          })
-        } else {
-          setStore("blocks", blockindex, {
-            ...block,
-            error: undefined,
-          })
-          datastack.push(
-            result
-          )
-        }
-      }
-      setStore("blocks", blockindex, {
-        ...block,
-        input: datastack.length - 1
-      })
-    }
-    console.log(JSON.stringify(store, null, 4))
-    setDataStack(datastack)
-  }
 
   processData(store, setStore, setDataStack)
 
@@ -348,8 +155,8 @@ function App() {
         <Card class="p-2 flex flex-row gap-2 h-min">
           <For each={Object.entries(blockdata)}>{([type, data]) =>
             <button type="button" class="group relative w-12" onClick={() => {
-              const object: Partial<BlockData> = {
-                type: type as BlockData["type"],
+              const object: Partial<Block> = {
+                type: type as Block["type"],
               }
               if (object.type == "caesar_cipher") {
                 object.data = {

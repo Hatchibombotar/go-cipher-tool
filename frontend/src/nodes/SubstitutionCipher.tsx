@@ -2,13 +2,16 @@ import { Switch, SwitchControl, SwitchThumb, SwitchLabel } from "~/components/ui
 import { For, createSignal } from "solid-js";
 import { CountMonograms } from "../../wailsjs/go/main/App";
 import { alphabet, panic, corpus_data } from "../utils";
+import { BlockData } from "~/blocks";
 
-export type SubstitutionCipherNodeData = {
+export interface SubstitutionCipherBlockData extends BlockData {
   type: "substitution_cipher",
   data: {
     subsitution: Record<string, string>
   }
 }
+
+
 
 export function SubstitutionCipher({ onChange, text }: { onChange: (subsitution: Record<string, string>) => void; text: () => string; }) {
   const [subsitution, setSubstitution] = createSignal<Record<string, string>>({});

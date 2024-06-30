@@ -2,8 +2,9 @@ import { BarChart } from "~/components/ui/charts";
 import { createEffect, createSignal } from "solid-js";
 import { CountMonograms } from "../../wailsjs/go/main/App";
 import { ChartData, ChartOptions } from "chart.js";
+import { BlockData } from "~/blocks";
 
-export type FrequencyAnalysisNodeData = {
+export interface FrequencyAnalysisBlockData extends BlockData {
   type: "frequency_analysis"
 }
 

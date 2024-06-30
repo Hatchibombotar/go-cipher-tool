@@ -1,4 +1,6 @@
-export type OutputNodeData = {
+import { BlockData } from "~/blocks";
+
+export interface OutputBlockData extends BlockData {
   type: "output"
 }
 

@@ -1,12 +1,14 @@
 import { Slider, SliderFill, SliderThumb, SliderTrack } from "~/components/ui/slider";
 import { createSignal } from "solid-js";
+import { BlockData } from "~/blocks";
 
-export type CaesarCipherNodeData = {
+export interface CaesarCipherBlockData extends BlockData {
   type: "caesar_cipher",
   data: {
     steps: number
   }
 }
+
 
 export function CaesarCipher({ onChange }: { onChange: (steps: number) => void; }) {
   const [steps, setSteps] = createSignal(0);

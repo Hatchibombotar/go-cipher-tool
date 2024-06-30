@@ -1,6 +1,7 @@
 import { createSignal } from "solid-js";
+import { BlockData } from "~/blocks";
 
-export type HighlightNodeData = {
+export interface HighlightBlockData extends BlockData {
   type: "highlight"
 }
 
