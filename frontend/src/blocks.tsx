@@ -1,5 +1,5 @@
 import { For, type Setter, createEffect, createSignal, ErrorBoundary, Show } from "solid-js";
-import { DecodeCaesarCipher, Format, DecodeSubsitutionCipher, DecodePolybiusCipher } from "../wailsjs/go/main/App";
+import { DecodeCaesarCipher, Format, DecodeSubsitutionCipher, DecodePolybiusCipher, MonogramIndexOfCoincidence } from "../wailsjs/go/main/App";
 import { FormatOptions, FormattingMode } from "./models";
 import { SetStoreFunction, createStore } from "solid-js/store";
 import { FaSolidAngleUp, FaSolidXmark, FaSolidAngleDown, FaSolidExclamation } from 'solid-icons/fa'
@@ -13,9 +13,9 @@ import { SubstitutionCipher, SubstitutionCipherBlockData } from "./nodes/Substit
 import { panic, assertError, Store } from "./utils";
 import { PolybiusCipher, PolybiusCipherBlockData } from "./nodes/Polybius";
 
-type BlockTypeId = "frequency_analysis" | "polybius_cipher" | "highlight" | "caesar_cipher" | "format" | "index_of_coincidence" | "output" | "substitution_cipher"
+export type BlockType = "frequency_analysis" | "polybius_cipher" | "highlight" | "caesar_cipher" | "format" | "index_of_coincidence" | "output" | "substitution_cipher"
 export interface BlockData {
-  type: BlockTypeId,
+  type: BlockType,
   input?: number,
   error?: Error,
 }
@@ -29,7 +29,7 @@ export type Block = FrequencyAnalysisBlockData |
   HighlightBlockData |
   IndexOfCoincidenceBlockData
 
-export const getBlockData: (store: Store, setStore: any) => Record<BlockData["type"], { title: string, description: string, component: (block: BlockData, data: () => string, index: () => number) => any, process?: (block: BlockData, previous: string) => Promise<string> }> = (_store, setStore) => ({
+export const getBlockData: (store: Store, setStore: any) => Record<BlockData["type"], { title: string, description: string, component: (block: BlockData, data: () => string, index: () => number) => any, process?: (block: BlockData, previous: string, index: number) => Promise<string> }> = (_store, setStore) => ({
   frequency_analysis: {
     title: "Frequency Analysis",
     description: "Count the frequency of Monograms",
@@ -40,9 +40,20 @@ export const getBlockData: (store: Store, setStore: any) => Record<BlockData["ty
   index_of_coincidence: {
     title: "Index of Coincidence",
     description: "Calculate the index of coinidence for the input text. Typical for English: 1.75",
-    component: (_block, data) => {
-      return <IndexOfCoincidence text={data} />
-    }
+    component: (block, data) => {
+      return <IndexOfCoincidence text={data} block={block as IndexOfCoincidenceBlockData} />
+    },
+    async process(block, previous, index) {
+      const ioc = await MonogramIndexOfCoincidence(previous);
+      setStore("blocks", index, {
+        ...block,
+        data: {
+          ioc
+        }
+      })
+
+      return previous
+    },
   },
   caesar_cipher: {
     title: "Caesar Cipher",
@@ -134,7 +145,6 @@ export const getBlockData: (store: Store, setStore: any) => Record<BlockData["ty
       }} />
     },
     process: (block, input) => {
-      console.log("hello?")
       return DecodePolybiusCipher(input, (block as PolybiusCipherBlockData).data.key)
     }
   }
@@ -150,7 +160,8 @@ export async function processData(store: Store, setStore: SetStoreFunction<Store
     if (block_data && block_data.process) {
       const result = await block_data.process(
         block,
-        datastack.at(-1) ?? panic()
+        datastack.at(-1) ?? panic(),
+        blockindex
       ).catch(
         assertError
       )

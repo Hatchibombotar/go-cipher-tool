@@ -1,23 +1,17 @@
-import { createEffect, createSignal } from "solid-js";
-import { MonogramIndexOfCoincidence } from "../../wailsjs/go/main/App";
 import { BlockData } from "~/blocks";
 
 export interface IndexOfCoincidenceBlockData extends BlockData {
-  type: "index_of_coincidence"
+  type: "index_of_coincidence",
+  data: {
+    ioc: number
+  }
 }
 
-export function IndexOfCoincidence({ text }: { text: () => string; }) {
-  const [ioc, setIoc] = createSignal(0);
-  createEffect(async () => {
-    setIoc(
-      await MonogramIndexOfCoincidence(text())
-    );
-  });
-
+export function IndexOfCoincidence({ text, block }: { text: () => string, block: IndexOfCoincidenceBlockData }) {
   return <div class="">
     <div class="h-96">
       <p class="font-semibold text-lg">
-        {ioc()}
+        {block.data.ioc}
       </p>
     </div>
   </div>;

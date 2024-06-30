@@ -61,9 +61,9 @@ func (a *App) DecodeSubsitutionCipher(text string, substitutions map[rune]rune) 
 	return decoded
 }
 
-func (a *App) MonogramIndexOfCoincidence(text string) float64 {
-	ioc := analysis.MonogramIndexOfCoincidence(text)
-	return ioc
+func (a *App) MonogramIndexOfCoincidence(text string) (float64, error) {
+	ioc, err := analysis.MonogramIndexOfCoincidence(text)
+	return ioc, err
 }
 
 func (a *App) Format(str string, options format.FormatOptions) string {

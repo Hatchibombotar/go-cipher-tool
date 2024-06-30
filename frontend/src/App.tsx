@@ -6,7 +6,7 @@ import { FormattingMode } from "./models";
 import { createStore } from "solid-js/store";
 import { FaSolidAngleUp, FaSolidXmark, FaSolidAngleDown, FaSolidExclamation } from 'solid-icons/fa'
 import { Store } from "./utils";
-import { Block, getBlockData, processData } from "./blocks";
+import { Block, BlockType, getBlockData, processData } from "./blocks";
 
 const example_workspace_caesar: Store = {
   text: "Hello, World!",
@@ -100,54 +100,65 @@ function App() {
 
           if (node.type in blockdata) {
             const thisblock = blockdata[node.type]
-            return <ErrorBoundary fallback={(err) => <div>Error: {err.message}</div>}>
-              <Card>
-                <CardHeader>
-                  <div class="flex gap-1">
-                    <CardTitle>{thisblock.title}</CardTitle>
-                    <div class="ml-auto flex gap-1">
-                      <Show when={node.error}>
-                        <div class="p-1 bg-red-300 hover:bg-red-400 rounded-sm group relative">
-                          <div class="hidden group-hover:block absolute top-full mt-1 left-0">
-                            <p class="w-36 bg-neutral-200 rounded px-2 py-1">{
-                              node.error?.message
-                            }</p>
-                          </div>
-                          <FaSolidExclamation> </FaSolidExclamation>
+            return <Card>
+              <CardHeader>
+                <div class="flex gap-1">
+                  <CardTitle>{thisblock.title}</CardTitle>
+                  <div class="ml-auto flex gap-1">
+                    <Show when={node.error}>
+                      <div class="p-1 bg-red-300 hover:bg-red-400 rounded-sm group relative">
+                        <div class="hidden group-hover:block absolute top-full mt-1 left-0">
+                          <p class="w-36 bg-neutral-200 rounded px-2 py-1">{
+                            node.error?.message
+                          }</p>
                         </div>
-                      </Show>
-                      <button type="button" class="p-1 hover:bg-slate-200 rounded-sm" onClick={() => {
-                        const oldIndex = blockIndex()
-                        const newIndex = Math.max(oldIndex - 1, 0)
-                        const new_store_data = store.blocks.filter((_, index) => index != oldIndex)
-                        new_store_data.splice(newIndex, 0, node)
-                        setStore("blocks", new_store_data)
-                      }}>
-                        <FaSolidAngleUp> </FaSolidAngleUp>
-                      </button>
-                      <button type="button" class="p-1 hover:bg-slate-200 rounded-sm" onClick={() => {
-                        const oldIndex = blockIndex()
-                        const newIndex = Math.min(oldIndex + 1, store.blocks.length - 1)
-                        const new_store_data = store.blocks.filter((_, index) => index != oldIndex)
-                        new_store_data.splice(newIndex, 0, node)
-                        setStore("blocks", new_store_data)
-                      }}>
-                        <FaSolidAngleDown></FaSolidAngleDown>
-                      </button>
-                      <button type="button" class="p-1 hover:bg-slate-200 rounded-sm" onClick={() => {
-                        setStore("blocks", store.blocks.filter((_, index) => index != blockIndex()))
-                      }}>
-                        <FaSolidXmark />
-                      </button>
-                    </div>
+                        <FaSolidExclamation> </FaSolidExclamation>
+                      </div>
+                    </Show>
+                    <button type="button" class="p-1 hover:bg-slate-200 rounded-sm" onClick={() => {
+                      const oldIndex = blockIndex()
+                      const newIndex = Math.max(oldIndex - 1, 0)
+                      const new_store_data = store.blocks.filter((_, index) => index != oldIndex)
+                      new_store_data.splice(newIndex, 0, node)
+                      setStore("blocks", new_store_data)
+                    }}>
+                      <FaSolidAngleUp> </FaSolidAngleUp>
+                    </button>
+                    <button type="button" class="p-1 hover:bg-slate-200 rounded-sm" onClick={() => {
+                      const oldIndex = blockIndex()
+                      const newIndex = Math.min(oldIndex + 1, store.blocks.length - 1)
+                      const new_store_data = store.blocks.filter((_, index) => index != oldIndex)
+                      new_store_data.splice(newIndex, 0, node)
+                      setStore("blocks", new_store_data)
+                    }}>
+                      <FaSolidAngleDown></FaSolidAngleDown>
+                    </button>
+                    <button type="button" class="p-1 hover:bg-slate-200 rounded-sm" onClick={() => {
+                      setStore("blocks", store.blocks.filter((_, index) => index != blockIndex()))
+                    }}>
+                      <FaSolidXmark />
+                    </button>
                   </div>
-                  <CardDescription>{thisblock.description}</CardDescription>
-                </CardHeader>
-                <CardContent>
+                </div>
+                <CardDescription>{thisblock.description}</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <ErrorBoundary fallback={(err, reset) => {
+                  createEffect(
+                    () => {
+                      // store;
+                      // reset()
+                    }
+                  )
+                  return <div>
+                    <p>Error: {err.message}</p>
+                    <button class="bg-red-400 rounded px-2 py-1 mt-2" onClick={reset}>Reset</button>
+                  </div>
+                }}>
                   {thisblock.component(node, data, blockIndex)}
-                </CardContent>
-              </Card>
-            </ErrorBoundary>
+                </ErrorBoundary>
+              </CardContent>
+            </Card>
           }
         }}
         </For>
@@ -156,7 +167,7 @@ function App() {
           <For each={Object.entries(blockdata)}>{([type, data]) =>
             <button type="button" class="group relative w-12" onClick={() => {
               const object: Partial<Block> = {
-                type: type as Block["type"],
+                type: type as BlockType,
               }
               if (object.type == "caesar_cipher") {
                 object.data = {
@@ -166,6 +177,10 @@ function App() {
                 object.data = {
                   case: FormattingMode.UnchangedCaseFormatting,
                   removeUnknown: false
+                }
+              } else if (object.type == "index_of_coincidence") {
+                object.data = {
+                  ioc: 0
                 }
               }
               setStore("blocks", store.blocks.length, object)

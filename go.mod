@@ -3,7 +3,7 @@ module changeme
 go 1.22.0
 
 require (
-	github.com/Hatchibombotar/go-cipher v0.0.0-20240629085806-7e9e93713f10
+	github.com/Hatchibombotar/go-cipher v0.0.0-20240630140504-94eed9a8d8b6
 	github.com/wailsapp/wails/v2 v2.7.1
 )
 
