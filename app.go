@@ -71,6 +71,14 @@ func (a *App) Format(str string, options format.FormatOptions) string {
 	return formatted
 }
 
+func (a *App) InferSpaces(str string) string {
+	return format.InferSpaces(str)
+}
+
+func (a *App) ColumnarTransposition(str string, columns int, key []int) (string, error) {
+	return cipher.ColumnarTransposition(str, columns, key)
+}
+
 func (a *App) DecodePolybiusCipher(encoded string, key string) (string, error) {
 	plaintext, err := cipher.DecodePolybiusCipher(encoded, key)
 	if err != nil {

@@ -5,19 +5,16 @@ import { BlockData } from "~/blocks"
 
 export interface FormatBlockData extends BlockData {
     type: "format",
-    data: {
-        case: FormattingMode,
-        removeUnknown: boolean,
-    }
+    data: FormatNodeSettings
 }
 
 type FormatNodeSettings = {
     case: FormattingMode
     removeUnknown: boolean
 }
-export function FormatNode({ onChange }: { onChange: (settings: FormatNodeSettings) => void }) {
-    const [caseType, setCaseType] = createSignal<FormatNodeSettings["case"]>(FormattingMode.UnchangedCaseFormatting)
-    const [removeUnknown, setRemoveUnknown] = createSignal(false)
+export function FormatNode({ onChange, defaultOptions }: { onChange: (settings: FormatNodeSettings) => void, defaultOptions: FormatNodeSettings }) {
+    const [caseType, setCaseType] = createSignal<FormatNodeSettings["case"]>(defaultOptions.case)
+    const [removeUnknown, setRemoveUnknown] = createSignal(defaultOptions.removeUnknown)
 
     function change() {
         onChange({
@@ -29,6 +26,7 @@ export function FormatNode({ onChange }: { onChange: (settings: FormatNodeSettin
     return <div class="flex flex-col gap-2">
         <select
             class="border mb-2 rounded-md px-2 py-1 text-base"
+            value={defaultOptions.case}
             onChange={(e) => {
                 setCaseType(Number(e.currentTarget.value) as FormattingMode)
                 change()

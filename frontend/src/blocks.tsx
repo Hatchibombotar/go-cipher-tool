@@ -1,5 +1,5 @@
 import { For, type Setter, createEffect, createSignal, ErrorBoundary, Show } from "solid-js";
-import { DecodeCaesarCipher, Format, DecodeSubsitutionCipher, DecodePolybiusCipher, MonogramIndexOfCoincidence } from "../wailsjs/go/main/App";
+import { DecodeCaesarCipher, Format, DecodeSubsitutionCipher, DecodePolybiusCipher, MonogramIndexOfCoincidence, InferSpaces } from "../wailsjs/go/main/App";
 import { FormatOptions, FormattingMode } from "./models";
 import { SetStoreFunction, createStore } from "solid-js/store";
 import { FaSolidAngleUp, FaSolidXmark, FaSolidAngleDown, FaSolidExclamation } from 'solid-icons/fa'
@@ -12,8 +12,9 @@ import { FrequencyAnalysis, FrequencyAnalysisBlockData } from "./nodes/Frequency
 import { SubstitutionCipher, SubstitutionCipherBlockData } from "./nodes/SubstitutionCipher";
 import { panic, assertError, Store } from "./utils";
 import { PolybiusCipher, PolybiusCipherBlockData } from "./nodes/Polybius";
+import { InferSpacesBlockData, InferSpacesNode } from "./nodes/InferSpaces";
 
-export type BlockType = "frequency_analysis" | "polybius_cipher" | "highlight" | "caesar_cipher" | "format" | "index_of_coincidence" | "output" | "substitution_cipher"
+export type BlockType = "frequency_analysis" | "polybius_cipher" | "highlight" | "caesar_cipher" | "format" | "index_of_coincidence" | "output" | "substitution_cipher" | "infer_spaces"
 export interface BlockData {
   type: BlockType,
   input?: number,
@@ -27,7 +28,8 @@ export type Block = FrequencyAnalysisBlockData |
   OutputBlockData |
   PolybiusCipherBlockData |
   HighlightBlockData |
-  IndexOfCoincidenceBlockData
+  IndexOfCoincidenceBlockData |
+  InferSpacesBlockData
 
 export const getBlockData: (store: Store, setStore: any) => Record<BlockData["type"], { title: string, description: string, component: (block: BlockData, data: () => string, index: () => number) => any, process?: (block: BlockData, previous: string, index: number) => Promise<string>, init?: () => any }> = (_store, setStore) => ({
   frequency_analysis: {
@@ -107,8 +109,8 @@ export const getBlockData: (store: Store, setStore: any) => Record<BlockData["ty
   format: {
     title: "Format",
     description: "Format Text",
-    component(_block, _data, index) {
-      return <FormatNode onChange={(settings) => {
+    component(block, _data, index) {
+      return <FormatNode defaultOptions={(block as FormatBlockData).data} onChange={(settings) => {
         setStore("blocks", index(), {
           type: "format",
           data: {
@@ -131,6 +133,16 @@ export const getBlockData: (store: Store, setStore: any) => Record<BlockData["ty
         case: FormattingMode.UnchangedCaseFormatting,
         removeUnknown: false
       }
+    }
+  },
+  infer_spaces: {
+    title: "Infer Spaces",
+    description: "Insert spaces into text without them by guessing based on the most probable words.",
+    component(_block, _data, index) {
+      return <InferSpacesNode />
+    },
+    process(block, previous) {
+      return InferSpaces(previous)
     }
   },
   output: {

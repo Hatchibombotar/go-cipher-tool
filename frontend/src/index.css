@@ -135,6 +135,6 @@
   }
 }
 
-:root {
+body {
   @apply bg-slate-50
 }
