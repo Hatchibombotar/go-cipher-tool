@@ -7,9 +7,9 @@
     <link rel="shortcut icon" type="image/ico" href="/src/assets/icon.png" />
     <title>Cipher Tool</title>
     <script src="wasm_exec.js"></script>
-    <script defer>
+    <script defer async type="module">
       const go = new Go();
-      WebAssembly.instantiateStreaming(fetch("main.wasm"), go.importObject).then((result) => {
+      await WebAssembly.instantiateStreaming(fetch("main.wasm"), go.importObject).then((result) => {
         go.run(result.instance);
       });
     </script>
