@@ -1,0 +1,8 @@
+{
+    "name": "Go Cipher Tool",
+    "short_name": "CipherTool",
+    "start_url": "https://hatchibombotar.com/go-cipher-tool/",
+    "scope": "https://hatchibombotar.com/go-cipher-tool/",
+    "lang": "en-GB",
+    "display": "standalone"
+}

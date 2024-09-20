@@ -4,14 +4,22 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="theme-color" content="#000000" />
-    <link rel="shortcut icon" type="image/ico" href="/src/assets/icon.png" />
+    <link rel="shortcut icon" type="image/ico" href="/icon.png" />
+
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="#f6f6f6">
+  
+    <link rel="apple-touch-icon" href="/icon.png">
+    <link rel="manifest" href="/manifest.json">
+
     <title>Cipher Tool</title>
+
     <script src="wasm_exec.js"></script>
     <script defer async type="module">
       const go = new Go();
-      await WebAssembly.instantiateStreaming(fetch("main.wasm"), go.importObject).then((result) => {
-        go.run(result.instance);
-      });
+      const result = await WebAssembly.instantiateStreaming(fetch("main.wasm"), go.importObject)
+      await go.run(result.instance);
     </script>
   </head>
   <body>

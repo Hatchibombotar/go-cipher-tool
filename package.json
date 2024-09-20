@@ -8,7 +8,7 @@
     "dev": "vite",
     "build": "vite build",
     "serve": "vite preview",
-    "build-go": "cd ./golang && set GOOS=js&& set GOARCH=wasm&& go build -o ../frontend/public/main.wasm"
+    "build-go": "cd ./golang && set GOOS=js&& set GOARCH=wasm&& go build -o ../public/main.wasm"
   },
   "license": "MIT",
   "devDependencies": {

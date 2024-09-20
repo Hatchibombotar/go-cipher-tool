@@ -1,4 +1,4 @@
-import { createSignal, For, onCleanup, onMount } from "solid-js";
+import { createEffect, createSignal, For, onCleanup, onMount } from "solid-js";
 import { InputNode } from "../nodes/InputNode";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../components/ui/card";
 import { createSwapy } from 'swapy'
@@ -35,13 +35,15 @@ export function Transposition() {
         return result
     }
 
+        
+
     onMount(() => {
         swapy = createSwapy(container, {
             continuousMode: true,
             animation: "none"
         })
         swapy.onSwap((e) => {
-            setColumnOrder(e.data.array.map(({ item }) => Number(item)))
+            setColumnOrder(e.data.array.map(({ itemId }) => Number(itemId)))
             setResult(getResult())
         })
     })
@@ -60,7 +62,7 @@ export function Transposition() {
             <CardContent>
                 <label>
                     <span class="font-semibold text-sm">Columns</span>
-                    <NumberField class="w-36" defaultValue={30} onChange={(v) => setColumns(Number(v))}>
+                    <NumberField class="w-36" defaultValue={30} onChange={(v) => setColumns(Number(v)) && swapy.setData({array: []})}>
                         <div class="relative">
                             <NumberFieldInput />
                             <NumberFieldIncrementTrigger />
@@ -71,26 +73,28 @@ export function Transposition() {
             </CardContent>
         </Card>
 
-        <div ref={container} class="grid gap-1 grid-rows-1 grid-flow-col w-full">
-            <For each={new Array(columns())}>{(_, col) => {
-                const [rowDrag, setRowDragging] = createSignal(false)
-                document.addEventListener("mouseup", () => setRowDragging(false))
-                return <div class="w-max h-auto" data-swapy-slot={col()}>
-                    <div
-                        onMouseDown={() => setRowDragging(true)}
-                        class="bg-white h-full text-center border border-neutral-200 shadow-sm rounded w-auto px-2"
-                        classList={{ "outline outline-offset-1": rowDrag() }}
-                        data-swapy-item={col()}
-                    >
-                        <p class="text-sm" data-swapy-exclude>{col()}</p>
-                        <div data-swapy-exclude>
-                            <For each={new Array(rows())}>{(_, row) =>
-                                <p>{formattedInput()[(row() * columns()) + col()]}</p>
-                            }</For>
+        <div ref={container} class="grid gap-1 grid-rows-1 grid-flow-col w-full overflow-x-auto">
+            {
+                columns() && <For each={new Array(columns())}>{(_, col) => {
+                    const [rowDrag, setRowDragging] = createSignal(false)
+                    document.addEventListener("mouseup", () => setRowDragging(false))
+                    return <div class="w-max h-auto" data-swapy-slot={col()}>
+                        <div
+                            onMouseDown={() => setRowDragging(true)}
+                            class="bg-white h-full text-center border border-neutral-200 shadow-sm rounded w-auto px-2"
+                            classList={{ "outline outline-offset-1": rowDrag() }}
+                            data-swapy-item={col()}
+                        >
+                            <p class="text-sm" data-swapy-exclude>{col()}</p>
+                            <div data-swapy-exclude>
+                                <For each={new Array(rows())}>{(_, row) =>
+                                    <p>{formattedInput()[(row() * columns()) + col()]}</p>
+                                }</For>
+                            </div>
                         </div>
                     </div>
-                </div>
-            }}</For>
+                }}</For>
+            }
         </div>
 
         <Card>

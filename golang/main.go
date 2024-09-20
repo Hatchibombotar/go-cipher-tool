@@ -60,16 +60,21 @@ func ReadRuneMapValue(v js.Value) (map[rune]rune, error) {
 }
 
 func main() {
-
 	c := make(chan struct{}, 0)
 
 	CreatePromiseFunc("MonogramIndexOfCoincidence", func(this js.Value, args []js.Value) (js.Value, error) {
+		if args[0].Type() != js.TypeString {
+			return js.Null(), errors.New("unexpected type of function argument")
+		}
 		text := args[0].String()
 		ioc, err := analysis.MonogramIndexOfCoincidence(text)
 		return js.ValueOf(ioc), err
 	})
 
 	CreatePromiseFunc("CountMonograms", func(this js.Value, args []js.Value) (js.Value, error) {
+		if args[0].Type() != js.TypeString {
+			return js.Null(), errors.New("unexpected type of function argument")
+		}
 		text := args[0].String()
 		monograms := analysis.CountMonograms(text)
 
@@ -83,6 +88,12 @@ func main() {
 	})
 
 	CreatePromiseFunc("DecodeCaesarCipher", func(this js.Value, args []js.Value) (js.Value, error) {
+		if args[0].Type() != js.TypeString {
+			return js.Null(), errors.New("unexpected type of function argument")
+		}
+		if args[1].Type() != js.TypeNumber {
+			return js.Null(), errors.New("unexpected type of function argument")
+		}
 		text := args[0].String()
 		steps := args[1].Int()
 
@@ -91,6 +102,9 @@ func main() {
 		return js.ValueOf(decoded), nil
 	})
 	CreatePromiseFunc("DecodeSubsitutionCipher", func(this js.Value, args []js.Value) (js.Value, error) {
+		if args[0].Type() != js.TypeString {
+			return js.Null(), errors.New("unexpected type of function argument")
+		}
 		text := args[0].String()
 		substitutions, _ := ReadRuneMapValue(args[1])
 
@@ -99,12 +113,18 @@ func main() {
 	})
 
 	CreatePromiseFunc("MonogramIndexOfCoincidence", func(this js.Value, args []js.Value) (js.Value, error) {
+		if args[0].Type() != js.TypeString {
+			return js.Null(), errors.New("unexpected type of function argument")
+		}
 		text := args[0].String()
 		ioc, err := analysis.MonogramIndexOfCoincidence(text)
 		return js.ValueOf(ioc), err
 	})
 
 	CreatePromiseFunc("Format", func(this js.Value, args []js.Value) (js.Value, error) {
+		if args[0].Type() != js.TypeString {
+			return js.Null(), errors.New("unexpected type of function argument")
+		}
 		text := args[0].String()
 
 		CaseMode := format.FormattingMode(args[1].Get("CaseMode").Int())
@@ -118,11 +138,20 @@ func main() {
 	})
 
 	CreatePromiseFunc("InferSpaces", func(this js.Value, args []js.Value) (js.Value, error) {
+		if args[0].Type() != js.TypeString {
+			return js.Null(), errors.New("unexpected type of function argument")
+		}
 		text := args[0].String()
 		return js.ValueOf(format.InferSpaces(text)), nil
 	})
 
 	CreatePromiseFunc("ColumnarTransposition", func(this js.Value, args []js.Value) (js.Value, error) {
+		if args[0].Type() != js.TypeString {
+			return js.Null(), errors.New("unexpected type of function argument")
+		}
+		if args[1].Type() != js.TypeNumber {
+			return js.Null(), errors.New("unexpected type of function argument")
+		}
 		text := args[0].String()
 		columns := args[1].Int()
 		// key := args[2]
@@ -133,11 +162,17 @@ func main() {
 	})
 
 	CreatePromiseFunc("DecodePolybiusCipher", func(this js.Value, args []js.Value) (js.Value, error) {
+		if args[0].Type() != js.TypeString {
+			return js.Null(), errors.New("unexpected type of function argument")
+		}
+		if args[1].Type() != js.TypeString {
+			return js.Null(), errors.New("unexpected type of function argument")
+		}
 		encoded := args[0].String()
 		key := args[1].String()
 		plaintext, err := cipher.DecodePolybiusCipher(encoded, key)
 		if err != nil {
-			return js.ValueOf(""), err
+			return js.Null(), err
 		}
 		return js.ValueOf(plaintext), nil
 	})
