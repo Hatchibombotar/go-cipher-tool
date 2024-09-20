@@ -18,8 +18,10 @@
     <script src="wasm_exec.js"></script>
     <script defer async type="module">
       const go = new Go();
-      const result = await WebAssembly.instantiateStreaming(fetch("main.wasm"), go.importObject)
-      await go.run(result.instance);
+
+      await WebAssembly.instantiateStreaming(fetch("main.wasm"), go.importObject).then((result) => {
+        go.run(result.instance);
+      });
     </script>
   </head>
   <body>
