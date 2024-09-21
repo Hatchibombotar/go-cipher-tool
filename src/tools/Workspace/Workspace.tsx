@@ -100,10 +100,10 @@ export function Workspace() {
         }
     }
     return <div class="">
-        <WorkspaceSave />
+        {/* <WorkspaceSave /> */}
         <div class="mb-4 -mt-1 flex gap-2">
-            <button class="hover:bg-neutral-200 font-semibold text-sm px-2 py-1 rounded-md" onClick={() => setSaveMenuOpen(true)}>Save Workspace</button>
-            <button class="hover:bg-neutral-200 font-semibold text-sm px-2 py-1 rounded-md">Load Workspace</button>
+            {/* <button class="hover:bg-neutral-200 font-semibold text-sm px-2 py-1 rounded-md" onClick={() => setSaveMenuOpen(true)}>Save Workspace</button> */}
+            {/* <button class="hover:bg-neutral-200 font-semibold text-sm px-2 py-1 rounded-md">Load Workspace</button> */}
             <button class="hover:bg-neutral-200 font-semibold text-sm px-2 py-1 rounded-md" onClick={confirmClear}>Clear Workspace</button>
         </div>
         <div class="grid gap-4 grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">

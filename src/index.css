@@ -138,3 +138,27 @@
 body {
   @apply bg-slate-50
 }
+
+
+
+.custom-table {
+  font-family: monospace;
+  border-collapse: collapse;
+  width: 100%;
+}
+
+.custom-table td, .custom-table th {
+  border: 1px solid #ddd;
+  padding: 8px;
+}
+
+
+.custom-table tr:hover {background-color: #ddd;}
+
+.custom-table th {
+  padding-top: 12px;
+  padding-bottom: 12px;
+  text-align: left;
+  background-color: #04AA6D;
+  color: white;
+}
