@@ -2,7 +2,7 @@ module hatchi/go-cipher-tool
 
 go 1.22.5
 
-require github.com/Hatchibombotar/go-cipher v0.0.0-20240921085720-10a8bb7df097
+require github.com/Hatchibombotar/go-cipher v0.0.0-20240922073529-c0a7cb3a46d6
 
 require (
 	github.com/mohae/deepcopy v0.0.0-20170929034955-c48cc78d4826 // indirect

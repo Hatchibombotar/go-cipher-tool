@@ -8,6 +8,10 @@ github.com/Hatchibombotar/go-cipher v0.0.0-20240914082112-f6abc517066b h1:B82ff0
 github.com/Hatchibombotar/go-cipher v0.0.0-20240914082112-f6abc517066b/go.mod h1:T/sKxu9pT+Hbr/2p9tsnfahmAnyKcrQrVI1zqSLKDzk=
 github.com/Hatchibombotar/go-cipher v0.0.0-20240921085720-10a8bb7df097 h1:C/coUU/xFm6laNBWhko+1r97rwTlrc4LiTiZ0XKZkIw=
 github.com/Hatchibombotar/go-cipher v0.0.0-20240921085720-10a8bb7df097/go.mod h1:T/sKxu9pT+Hbr/2p9tsnfahmAnyKcrQrVI1zqSLKDzk=
+github.com/Hatchibombotar/go-cipher v0.0.0-20240921175619-746948487762 h1:OqXvlw5B7rCY6lGy4z+ARhncCnvVpa0uL4xijShuRPI=
+github.com/Hatchibombotar/go-cipher v0.0.0-20240921175619-746948487762/go.mod h1:T/sKxu9pT+Hbr/2p9tsnfahmAnyKcrQrVI1zqSLKDzk=
+github.com/Hatchibombotar/go-cipher v0.0.0-20240922073529-c0a7cb3a46d6 h1:76mZRAsU0i/Tj+ZluBZWoy9oke+502XQJUxPHc5DGg4=
+github.com/Hatchibombotar/go-cipher v0.0.0-20240922073529-c0a7cb3a46d6/go.mod h1:T/sKxu9pT+Hbr/2p9tsnfahmAnyKcrQrVI1zqSLKDzk=
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/mohae/deepcopy v0.0.0-20170929034955-c48cc78d4826 h1:RWengNIwukTxcDr9M+97sNutRR1RKhG96O6jWumTTnw=

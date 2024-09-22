@@ -108,8 +108,8 @@ func main() {
 		text := args[0].String()
 		substitutions, _ := ReadRuneMapValue(args[1])
 
-		decoded := cipher.SubstitutionCipher(text, substitutions)
-		return js.ValueOf(decoded), nil
+		decoded, err := cipher.SubstitutionCipher(text, substitutions)
+		return js.ValueOf(decoded), err
 	})
 
 	CreatePromiseFunc("MonogramIndexOfCoincidence", func(this js.Value, args []js.Value) (js.Value, error) {
