@@ -2,6 +2,7 @@ import { BarChart } from "~/components/ui/charts";
 import { createEffect, createSignal } from "solid-js";
 import { ChartData, ChartOptions } from "chart.js";
 import { BlockData } from "~/tools/Workspace/blocks";
+import { corpusMonograms } from "~/globalstate";
 
 export interface FrequencyAnalysisBlockData extends BlockData {
   type: "frequency_analysis"
@@ -24,8 +25,8 @@ export function FrequencyAnalysis({ text }: { text: () => string; }) {
       },
 
       {
-        label: "English",
-        data: [8.167, 1.492, 2.202, 4.253, 12.702, 2.228, 2.015, 6.094, 6.966, 0.0153, 1.292, 4.025, 2.406, 6.749, 7.507, 1.929, 0.0095, 5.987, 6.327, 9.356, 2.758, 0.0978, 2.56, 0.015, 1.994, 0.0077],
+        label: "Corpus",
+        data: letters.map((letter) => corpusMonograms()[letter]) ?? [],
         yAxisID: "y1"
       }
     ],

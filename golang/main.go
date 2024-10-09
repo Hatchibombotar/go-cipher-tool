@@ -9,6 +9,7 @@ import (
 
 	"github.com/Hatchibombotar/go-cipher/analysis"
 	"github.com/Hatchibombotar/go-cipher/cipher"
+	"github.com/Hatchibombotar/go-cipher/corpus"
 	"github.com/Hatchibombotar/go-cipher/format"
 )
 
@@ -24,7 +25,9 @@ func CreatePromiseFunc(name string, f func(js.Value, []js.Value) (js.Value, erro
 				if err == nil {
 					resolve.Invoke(result)
 				} else {
-					reject.Invoke(err)
+					errorConstructor := js.Global().Get("Error")
+					errorObject := errorConstructor.New(err.Error())
+					reject.Invoke(errorObject)
 				}
 			}()
 
@@ -86,6 +89,27 @@ func main() {
 
 		return js.ValueOf(convertedMonograms), nil
 	})
+	CreatePromiseFunc("CountNGrams", func(this js.Value, args []js.Value) (js.Value, error) {
+		if args[0].Type() != js.TypeString {
+			return js.Null(), errors.New("unexpected type of function argument")
+		}
+		text := args[0].String()
+		size := args[1].Int()
+
+		ngrams, err := analysis.CountNGrams(text, size)
+
+		if err != nil {
+			return js.Null(), err
+		}
+
+		convertedNGrams := make(map[string]interface{})
+
+		for key, value := range ngrams {
+			convertedNGrams[key] = value
+		}
+
+		return js.ValueOf(convertedNGrams), nil
+	})
 
 	CreatePromiseFunc("DecodeCaesarCipher", func(this js.Value, args []js.Value) (js.Value, error) {
 		if args[0].Type() != js.TypeString {
@@ -101,6 +125,7 @@ func main() {
 
 		return js.ValueOf(decoded), nil
 	})
+
 	CreatePromiseFunc("DecodeSubsitutionCipher", func(this js.Value, args []js.Value) (js.Value, error) {
 		if args[0].Type() != js.TypeString {
 			return js.Null(), errors.New("unexpected type of function argument")
@@ -182,6 +207,27 @@ func main() {
 		fmt.Println("Finished!")
 		return js.Null(), nil
 	})
+
+	CreatePromiseFunc("GetRawCorpus", func(this js.Value, args []js.Value) (js.Value, error) {
+		raw_corpus := corpus.GetRawCorpus()
+
+		return js.ValueOf(raw_corpus), nil
+	})
+
+	CreatePromiseFunc("LoadCorpusData", func(this js.Value, args []js.Value) (js.Value, error) {
+		raw_corpus := corpus.GetRawCorpus()
+		monograms := analysis.CountMonograms(raw_corpus)
+
+		monogramObject := make(map[string]interface{})
+
+		for key, value := range monograms {
+			monogramObject[key] = value
+		}
+
+		return js.ValueOf(monogramObject), nil
+	})
+
+	js.Global().Set("Ready", js.ValueOf("ready!"))
 
 	<-c
 }

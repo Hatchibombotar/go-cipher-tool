@@ -11,8 +11,9 @@ import { panic, assertError, Store } from "../../utils";
 import { PolybiusCipher, PolybiusCipherBlockData } from "../../nodes/Polybius";
 import { InferSpacesBlockData, InferSpacesNode } from "../../nodes/InferSpaces";
 import { Setter } from "solid-js";
+import { NGramAnalysis, NGramBlockData } from "~/nodes/NGramAnalysis";
 
-export type BlockType = "frequency_analysis" | "polybius_cipher" | "highlight" | "caesar_cipher" | "format" | "index_of_coincidence" | "output" | "substitution_cipher" | "infer_spaces"
+export type BlockType = "frequency_analysis" | "polybius_cipher" | "highlight" | "caesar_cipher" | "format" | "index_of_coincidence" | "output" | "substitution_cipher" | "infer_spaces" | "count_n_grams"
 export interface BlockData {
   type: BlockType,
   input?: number,
@@ -27,14 +28,28 @@ export type Block = FrequencyAnalysisBlockData |
   PolybiusCipherBlockData |
   HighlightBlockData |
   IndexOfCoincidenceBlockData |
-  InferSpacesBlockData
+  InferSpacesBlockData |
+  NGramBlockData
 
-export const getBlockData: (store: Store, setStore: any) => Record<BlockData["type"], { title: string, description: string, component: (block: BlockData, data: () => string, index: () => number) => any, process?: (block: BlockData, previous: string, index: number) => Promise<string>, init?: () => any }> = (_store, setStore) => ({
+export const getBlockData: (store: Store, setStore: SetStoreFunction<Store>) => Record<BlockData["type"], { title: string, description: string, component: (block: BlockData, data: () => string, index: () => number) => any, process?: (block: BlockData, previous: string, index: number) => Promise<string>, init?: () => any }> = (_store, setStore) => ({
   frequency_analysis: {
     title: "Frequency Analysis",
     description: "Count the frequency of Monograms",
     component: (_block, data) => {
       return <FrequencyAnalysis text={data} />
+    }
+  },
+  count_n_grams: {
+    title: "Count N Grams",
+    description: "Count the frequency of NGrams",
+    component: (block, data) => {
+      return <NGramAnalysis block={block as NGramBlockData} text={data} />
+    },
+    init() {
+      return {
+        type: "count_n_grams",
+        size: 2,
+      } as NGramBlockData
     }
   },
   index_of_coincidence: {
@@ -50,7 +65,7 @@ export const getBlockData: (store: Store, setStore: any) => Record<BlockData["ty
         data: {
           ioc
         }
-      })
+      } as IndexOfCoincidenceBlockData)
 
       return previous
     },
@@ -173,7 +188,7 @@ export const getBlockData: (store: Store, setStore: any) => Record<BlockData["ty
     process: (block, input) => {
       return DecodePolybiusCipher(input, (block as PolybiusCipherBlockData).data.key)
     }
-  }
+  },
 })
 
 export async function processData(store: Store, setStore: SetStoreFunction<Store>, setDataStack: Setter<string[]>) {

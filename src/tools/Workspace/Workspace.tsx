@@ -184,7 +184,7 @@ export function Workspace() {
                 <For each={Object.entries(blockdata)}>{([type, data]) =>
                     <button type="button" class="group relative" onClick={() => {
                         const object: Partial<Block> = {
-                            type: type as BlockType,
+                            type: type as BlockType
                         }
                         if (data.init) {
                             (object as any).data = data.init()

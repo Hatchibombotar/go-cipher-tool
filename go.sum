@@ -12,6 +12,16 @@ github.com/Hatchibombotar/go-cipher v0.0.0-20240921175619-746948487762 h1:OqXvlw
 github.com/Hatchibombotar/go-cipher v0.0.0-20240921175619-746948487762/go.mod h1:T/sKxu9pT+Hbr/2p9tsnfahmAnyKcrQrVI1zqSLKDzk=
 github.com/Hatchibombotar/go-cipher v0.0.0-20240922073529-c0a7cb3a46d6 h1:76mZRAsU0i/Tj+ZluBZWoy9oke+502XQJUxPHc5DGg4=
 github.com/Hatchibombotar/go-cipher v0.0.0-20240922073529-c0a7cb3a46d6/go.mod h1:T/sKxu9pT+Hbr/2p9tsnfahmAnyKcrQrVI1zqSLKDzk=
+github.com/Hatchibombotar/go-cipher v0.0.0-20241007173219-3c46ec64a403 h1:XgLhrGNqK6oS12/yDF9+OfNC2+gnN3x/gb0yojDMFFo=
+github.com/Hatchibombotar/go-cipher v0.0.0-20241007173219-3c46ec64a403/go.mod h1:T/sKxu9pT+Hbr/2p9tsnfahmAnyKcrQrVI1zqSLKDzk=
+github.com/Hatchibombotar/go-cipher v0.0.0-20241007174525-df0acb5c7b23 h1:gfYvgTSgGEkGq/pAT2jfFZeXuD6x2B4bXe4FbiyRZS4=
+github.com/Hatchibombotar/go-cipher v0.0.0-20241007174525-df0acb5c7b23/go.mod h1:T/sKxu9pT+Hbr/2p9tsnfahmAnyKcrQrVI1zqSLKDzk=
+github.com/Hatchibombotar/go-cipher v0.0.0-20241007183712-389ce33e7c67 h1:zNfK+2c+R0MPgV6HMipJ0f4xGTgMIiUtmj32cPr5QF0=
+github.com/Hatchibombotar/go-cipher v0.0.0-20241007183712-389ce33e7c67/go.mod h1:T/sKxu9pT+Hbr/2p9tsnfahmAnyKcrQrVI1zqSLKDzk=
+github.com/Hatchibombotar/go-cipher v0.0.0-20241007185237-bf537fc95f7a h1:U0plPPh6mOAYwQMxkRQF6yy0SnEfoG0gfw9nvipA+jw=
+github.com/Hatchibombotar/go-cipher v0.0.0-20241007185237-bf537fc95f7a/go.mod h1:T/sKxu9pT+Hbr/2p9tsnfahmAnyKcrQrVI1zqSLKDzk=
+github.com/Hatchibombotar/go-cipher v0.0.0-20241009170653-26367bc63d4e h1:Z86VPBS+E3FxcRUOGcHJKheoyWw/i58lMY2kFPtK3pE=
+github.com/Hatchibombotar/go-cipher v0.0.0-20241009170653-26367bc63d4e/go.mod h1:T/sKxu9pT+Hbr/2p9tsnfahmAnyKcrQrVI1zqSLKDzk=
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/mohae/deepcopy v0.0.0-20170929034955-c48cc78d4826 h1:RWengNIwukTxcDr9M+97sNutRR1RKhG96O6jWumTTnw=

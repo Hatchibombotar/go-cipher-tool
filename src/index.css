@@ -162,3 +162,21 @@ body {
   background-color: #04AA6D;
   color: white;
 }
+
+
+.ngram-table {
+  @apply w-72;
+  table-layout: fixed;
+  font-family: monospace;
+  border-collapse: collapse;
+}
+
+.ngram-table td, .ngram-table th {
+  border: 1px solid #ddd;
+  text-align: center;
+}
+
+.ngram-table th {
+  padding-top: 12px;
+  padding-bottom: 12px;
+}
