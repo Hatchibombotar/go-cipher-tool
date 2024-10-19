@@ -20,6 +20,10 @@ declare global {
     function LoadCorpusData(): Promise<any>;
 
     function GetRawCorpus(): Promise<string>;
+
+    function EncodeAffineCipher(text: string, a: number, b: number): Promise<string>;
+    function DecodeAffineCipher(text: string, a: number, b: number): Promise<string>;
+    function AttemptCrackAffineCipher(text: string): Promise<[number, number]>;
 }
 
 export default global

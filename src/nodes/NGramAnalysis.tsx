@@ -7,7 +7,7 @@ export interface NGramBlockData extends BlockData {
   size: number
 }
 
-export function NGramAnalysis({ text, block,  }: { text: () => string, block: NGramBlockData}) {
+export function NGramAnalysis({ text, block, }: { text: () => string, block: NGramBlockData }) {
   const [ngrams, setNGrams] = createSignal<Record<string, number>>({});
   const [ngramSize, setNGramSize] = createSignal(block.size ?? 2)
 

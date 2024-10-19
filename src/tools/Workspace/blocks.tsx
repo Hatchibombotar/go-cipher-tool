@@ -12,11 +12,12 @@ import { PolybiusCipher, PolybiusCipherBlockData } from "../../nodes/Polybius";
 import { InferSpacesBlockData, InferSpacesNode } from "../../nodes/InferSpaces";
 import { Setter } from "solid-js";
 import { NGramAnalysis, NGramBlockData } from "~/nodes/NGramAnalysis";
+import { AffineCipher, AffineCipherBlockData } from "~/nodes/AffineCipher";
 
-export type BlockType = "frequency_analysis" | "polybius_cipher" | "highlight" | "caesar_cipher" | "format" | "index_of_coincidence" | "output" | "substitution_cipher" | "infer_spaces" | "count_n_grams"
 export interface BlockData {
   type: BlockType,
   input?: number,
+  data?: any,
   error?: Error,
 }
 
@@ -29,9 +30,12 @@ export type Block = FrequencyAnalysisBlockData |
   HighlightBlockData |
   IndexOfCoincidenceBlockData |
   InferSpacesBlockData |
-  NGramBlockData
+  NGramBlockData |
+  AffineCipherBlockData
 
-export const getBlockData: (store: Store, setStore: SetStoreFunction<Store>) => Record<BlockData["type"], { title: string, description: string, component: (block: BlockData, data: () => string, index: () => number) => any, process?: (block: BlockData, previous: string, index: number) => Promise<string>, init?: () => any }> = (_store, setStore) => ({
+export type BlockType = Block["type"]
+
+export const getBlockData: (store: Store, setStore: SetStoreFunction<Store>) => Record<BlockData["type"], { title: string, description: string, component: (block: BlockData, data: () => string, index: () => number) => any, process?: (block: Block, previous: string, index: number) => Promise<string>, init?: () => any }> = (_store, setStore) => ({
   frequency_analysis: {
     title: "Frequency Analysis",
     description: "Count the frequency of Monograms",
@@ -189,6 +193,42 @@ export const getBlockData: (store: Store, setStore: SetStoreFunction<Store>) => 
       return DecodePolybiusCipher(input, (block as PolybiusCipherBlockData).data.key)
     }
   },
+  affine_cipher: {
+
+    title: "Affine Cipher",
+    description: "Encode/Decode",
+    component(block, _data, index) {
+      return <AffineCipher block={block as AffineCipherBlockData} setBlockData={(data) => {
+        setStore("blocks", index(), "data", data)
+      }}
+      />
+    },
+    async process(block, previous, index) {
+      block as AffineCipherBlockData
+      const data = (block as AffineCipherBlockData).data
+      if (data.type == "encode") {
+        return EncodeAffineCipher(previous, data.a, data.b)
+      } else {
+        if (data.auto_solve) {
+          const [a, b] = await AttemptCrackAffineCipher(previous)
+          setStore("blocks", index, "data", "a", a)
+          setStore("blocks", index, "data", "b", b)
+          return DecodeAffineCipher(previous, a, b)
+        } else {
+          return DecodeAffineCipher(previous, data.a, data.b)
+        }
+      }
+      // return DecodeCaesarCipher(previous, (block as CaesarCipherBlockData).data.steps)
+    },
+    init() {
+      return {
+        a: 1,
+        b: 0,
+        type: "encode",
+        auto_solve: true
+      } as AffineCipherBlockData["data"]
+    }
+  }
 })
 
 export async function processData(store: Store, setStore: SetStoreFunction<Store>, setDataStack: Setter<string[]>) {

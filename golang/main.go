@@ -84,7 +84,7 @@ func main() {
 		convertedMonograms := make(map[string]interface{})
 
 		for key, value := range monograms {
-			convertedMonograms[key] = value
+			convertedMonograms[string(key)] = value
 		}
 
 		return js.ValueOf(convertedMonograms), nil
@@ -221,10 +221,69 @@ func main() {
 		monogramObject := make(map[string]interface{})
 
 		for key, value := range monograms {
-			monogramObject[key] = value
+			monogramObject[string(key)] = value
 		}
 
 		return js.ValueOf(monogramObject), nil
+	})
+
+	CreatePromiseFunc("EncodeAffineCipher", func(this js.Value, args []js.Value) (js.Value, error) {
+		if args[0].Type() != js.TypeString {
+			return js.Null(), errors.New("unexpected type of function argument")
+		}
+		if args[1].Type() != js.TypeNumber {
+			return js.Null(), errors.New("unexpected type of function argument")
+		}
+		if args[2].Type() != js.TypeNumber {
+			return js.Null(), errors.New("unexpected type of function argument")
+		}
+		text := args[0].String()
+		a := args[1].Int()
+		b := args[2].Int()
+
+		encoded := cipher.EncodeAffineCipher(text, a, b)
+
+		return js.ValueOf(encoded), nil
+	})
+
+	CreatePromiseFunc("DecodeAffineCipher", func(this js.Value, args []js.Value) (js.Value, error) {
+		if args[0].Type() != js.TypeString {
+			return js.Null(), errors.New("unexpected type of function argument")
+		}
+		if args[1].Type() != js.TypeNumber {
+			return js.Null(), errors.New("unexpected type of function argument")
+		}
+		if args[2].Type() != js.TypeNumber {
+			return js.Null(), errors.New("unexpected type of function argument")
+		}
+		text := args[0].String()
+		a := args[1].Int()
+		b := args[2].Int()
+
+		encoded, err := cipher.DecodeAffineCipher(text, a, b)
+		if err != nil {
+			return js.Null(), err
+		}
+
+		return js.ValueOf(encoded), nil
+	})
+
+	CreatePromiseFunc("AttemptCrackAffineCipher", func(this js.Value, args []js.Value) (js.Value, error) {
+		if args[0].Type() != js.TypeString {
+			return js.Null(), errors.New("unexpected type of function argument")
+		}
+		text := args[0].String()
+
+		a, b, err := cipher.AttemptCrackAffineCipher(text)
+		if err != nil {
+			return js.Null(), err
+		}
+
+		result := make([]interface{}, 2)
+		result[0] = a
+		result[1] = b
+
+		return js.ValueOf(result), nil
 	})
 
 	js.Global().Set("Ready", js.ValueOf("ready!"))
