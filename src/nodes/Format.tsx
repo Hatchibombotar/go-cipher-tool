@@ -1,9 +1,9 @@
 import { Switch, SwitchControl, SwitchThumb, SwitchLabel } from "~/components/ui/switch"
 import { createSignal } from "solid-js"
-import { FormattingMode } from "~/gofunctiontypes"
-import { BlockData } from "~/tools/Workspace/blocks"
+import { FormatOptions, FormattingMode } from "~/gofunctiontypes"
+import { BlockPrimitive, WorkspaceNodeInfo, WorkspaceNodeProps } from "~/tools/Workspace/blocks"
 
-export interface FormatBlockData extends BlockData {
+export interface FormatBlockData extends BlockPrimitive {
     type: "format",
     data: FormatNodeSettings
 }
@@ -12,21 +12,22 @@ type FormatNodeSettings = {
     case: FormattingMode
     removeUnknown: boolean
 }
-export function FormatNode({ onChange, defaultOptions }: { onChange: (settings: FormatNodeSettings) => void, defaultOptions: FormatNodeSettings }) {
-    const [caseType, setCaseType] = createSignal<FormatNodeSettings["case"]>(defaultOptions.case)
-    const [removeUnknown, setRemoveUnknown] = createSignal(defaultOptions.removeUnknown)
+
+function FormatNode({ block, setter }: WorkspaceNodeProps<FormatBlockData>) {
+    const [caseType, setCaseType] = createSignal<FormatNodeSettings["case"]>(block.data.case)
+    const [removeUnknown, setRemoveUnknown] = createSignal(block.data.removeUnknown)
 
     function change() {
-        onChange({
-            case: caseType(),
-            removeUnknown: removeUnknown()
+        setter((state) => {
+            state.data.case = caseType()
+            state.data.removeUnknown = removeUnknown()
         })
     }
 
     return <div class="flex flex-col gap-2">
         <select
             class="border mb-2 rounded-md px-2 py-1 text-base"
-            value={defaultOptions.case}
+            value={block.data.case}
             onChange={(e) => {
                 setCaseType(Number(e.currentTarget.value) as FormattingMode)
                 change()
@@ -50,3 +51,22 @@ export function FormatNode({ onChange, defaultOptions }: { onChange: (settings: 
         </Switch>
     </div>
 }
+
+export default {
+    title: "Format",
+    description: "Format Text",
+    component: FormatNode,
+    process: async (block, previous,) => {
+        const options: FormatOptions = {
+            CaseMode: block.data.case,
+            RemoveUnknown: block.data.removeUnknown
+        }
+        return Format(previous, options)
+    },
+    init() {
+        return {
+            case: FormattingMode.UnchangedCaseFormatting,
+            removeUnknown: false
+        }
+    }
+} as WorkspaceNodeInfo<FormatBlockData>

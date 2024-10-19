@@ -1,13 +1,13 @@
 import { createEffect, createSignal, For } from "solid-js";
-import { BlockData } from "~/tools/Workspace/blocks";
+import { BlockPrimitive, WorkspaceNodeInfo, WorkspaceNodeProps } from "~/tools/Workspace/blocks";
 import { corpusNGrams, corpusRaw, setCorpusNGrams } from "~/globalstate";
 
-export interface NGramBlockData extends BlockData {
-  type: "count_n_grams"
+export interface NGramBlockData extends BlockPrimitive {
+  type: "count_n_grams",
   size: number
 }
 
-export function NGramAnalysis({ text, block, }: { text: () => string, block: NGramBlockData }) {
+export function NGramAnalysis({ text, block, }: WorkspaceNodeProps<NGramBlockData>) {
   const [ngrams, setNGrams] = createSignal<Record<string, number>>({});
   const [ngramSize, setNGramSize] = createSignal(block.size ?? 2)
 
@@ -59,3 +59,12 @@ export function NGramAnalysis({ text, block, }: { text: () => string, block: NGr
     </div>
   </div>;
 }
+
+export default {
+  title: "Count N Grams",
+  description: "Encode/Decode",
+  component: NGramAnalysis,
+  init() {
+    return {}
+  }
+} as WorkspaceNodeInfo<NGramBlockData>

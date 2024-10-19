@@ -1,23 +1,25 @@
 import { Slider, SliderFill, SliderThumb, SliderTrack } from "~/components/ui/slider";
-import { createSignal } from "solid-js";
-import { BlockData } from "~/tools/Workspace/blocks";
+import { createEffect, createSignal } from "solid-js";
+import { BlockPrimitive, WorkspaceNodeInfo, WorkspaceNodeProps } from "~/tools/Workspace/blocks";
 
-export interface CaesarCipherBlockData extends BlockData {
+export interface CaesarCipherBlockData extends BlockPrimitive {
   type: "caesar_cipher",
   data: {
     steps: number
   }
 }
 
+export function CaesarCipher({ setter, block}: WorkspaceNodeProps<CaesarCipherBlockData>) {
+  const [steps, setSteps] = createSignal(0)
 
-export function CaesarCipher({ onChange }: { onChange: (steps: number) => void; }) {
-  const [steps, setSteps] = createSignal(0);
   return <div class="">
     <div class="flex flex-col">
       <p class="ml-auto mr-0 mb-1">{steps()}</p>
-      <Slider defaultValue={[0]} step={1} minValue={-26} maxValue={26} onChange={(e) => {
-        onChange(e[0]);
-        setSteps(e[0]);
+      <Slider value={[steps()]} step={1} minValue={-26} maxValue={26} onChange={(e) => {
+        setSteps(e[0])
+        setter((block) => {
+          block.data.steps = steps()
+        })
       }}>
         <SliderTrack>
           <SliderFill />
@@ -27,3 +29,17 @@ export function CaesarCipher({ onChange }: { onChange: (steps: number) => void; 
     </div>
   </div>;
 }
+
+export default {
+  title: "Caesar Cipher",
+  description: "Encode/Decode",
+  component: CaesarCipher,
+  process: (block, previous) => {
+    return DecodeCaesarCipher(previous, (block as CaesarCipherBlockData).data.steps)
+  },
+  init() {
+    return {
+      steps: 0
+    }
+  }
+} as WorkspaceNodeInfo<CaesarCipherBlockData>

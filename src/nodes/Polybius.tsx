@@ -1,21 +1,27 @@
 import { Switch, SwitchControl, SwitchThumb, SwitchLabel } from "~/components/ui/switch";
 import { For, createEffect, createSignal } from "solid-js";
 import { alphabet, panic, corpus_data } from "../utils";
-import { BlockData } from "~/tools/Workspace/blocks";
+import { BlockPrimitive, WorkspaceNodeInfo, WorkspaceNodeProps } from "~/tools/Workspace/blocks";
 
-export interface PolybiusCipherBlockData extends BlockData {
+export interface PolybiusCipherBlockData extends BlockPrimitive {
   type: "polybius_cipher",
   data: {
     key: string
   }
 }
 
-export function PolybiusCipher({ onChange, text }: { onChange: (key: string[]) => void; text: () => string; }) {
+export function PolybiusCipher({ setter }: WorkspaceNodeProps<PolybiusCipherBlockData>) {
   const [allowDuplicates, setAllowDuplicates] = createSignal(false);
   const [autoFill, setAutoFill] = createSignal(true);
 
   const [key, setKey] = createSignal<string[]>("abcdefghiklmnopqrstuvwxyz".split(""))
   const [skipLetter, setSkippedLetter] = createSignal("j")
+
+  function onChange(key: string[]) {
+    setter((state) => {
+      state.data.key = key.join("")
+    })
+  }
 
   function fillRemaining(currentKey: string[] = [...key()]) {
     if (skipLetter() == "") {
@@ -145,3 +151,18 @@ export function PolybiusCipher({ onChange, text }: { onChange: (key: string[]) =
     </div>
   </div>;
 }
+
+
+export default {
+  title: "Polybius Cipher",
+  description: "Decode",
+  component: PolybiusCipher,
+  process: async (block, previous) => {
+    return DecodePolybiusCipher(previous, block.data.key)
+  },
+  init() {
+    return {
+      key: ""
+    }
+  },
+} as WorkspaceNodeInfo<PolybiusCipherBlockData>

@@ -1,21 +1,25 @@
 import { Switch, SwitchControl, SwitchThumb, SwitchLabel } from "~/components/ui/switch";
 import { For, createSignal } from "solid-js";
 import { alphabet, panic, corpus_data } from "../utils";
-import { BlockData } from "~/tools/Workspace/blocks";
+import { BlockPrimitive, WorkspaceNodeInfo, WorkspaceNodeProps } from "~/tools/Workspace/blocks";
 
-export interface SubstitutionCipherBlockData extends BlockData {
+export interface SubstitutionCipherBlockData extends BlockPrimitive {
   type: "substitution_cipher",
   data: {
     subsitution: Record<string, string>
   }
 }
 
-
-
-export function SubstitutionCipher({ onChange, text }: { onChange: (subsitution: Record<string, string>) => void; text: () => string; }) {
+function SubstitutionCipher({ setter, text }: WorkspaceNodeProps<SubstitutionCipherBlockData>) {
   const [subsitution, setSubstitution] = createSignal<Record<string, string>>({});
   const [allowDuplicates, setAllowDuplicates] = createSignal(false);
   const [autoFill, setAutoFill] = createSignal(true);
+
+  function onChange(subsitution: Record<string, string>) {
+    setter((state) => {
+      state.data.subsitution = subsitution
+    })
+  }
 
   function fillRemaining(currentSubstitution: Record<string, string> = { ...subsitution() }) {
     let remaining_letters = [...alphabet].filter(
@@ -116,5 +120,22 @@ export function SubstitutionCipher({ onChange, text }: { onChange: (subsitution:
         <SwitchLabel>Auto Fill</SwitchLabel>
       </Switch>
     </div>
-  </div>;
+  </div>
 }
+
+export default {
+  title: "Substitution Cipher",
+  description: "Encode/Decode",
+  component: SubstitutionCipher,
+  process: async (block, previous, _, setter) => {
+    const subsitution_with_runes = Object.fromEntries(
+      Object.entries(block.data.subsitution).map(([k, v]) => [k.charCodeAt(0), v.charCodeAt(0)])
+    )
+    return DecodeSubsitutionCipher(previous, subsitution_with_runes)
+  },
+  init() {
+    return {
+      subsitution: {}
+    }
+  }
+} as WorkspaceNodeInfo<SubstitutionCipherBlockData>

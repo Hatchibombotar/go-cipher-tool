@@ -1,6 +1,6 @@
-import { BlockData } from "~/tools/Workspace/blocks";
+import { BlockPrimitive, WorkspaceNodeInfo } from "~/tools/Workspace/blocks";
 
-export interface OutputBlockData extends BlockData {
+export interface OutputBlockData extends BlockPrimitive {
   type: "output"
 }
 
@@ -11,3 +11,10 @@ export function Output({ text }: { text: () => string; }) {
     </div>
   </div>;
 }
+export const info: WorkspaceNodeInfo<OutputBlockData> = {
+  title: "Output",
+  description: "Encode/Decode",
+  component: Output,
+}
+
+export default info

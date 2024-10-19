@@ -2,75 +2,74 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "~/com
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "~/components/ui/dialog"
 import { For, createEffect, createSignal, ErrorBoundary, Show } from "solid-js";
 import { FormattingMode } from "../../gofunctiontypes";
-import { createStore } from "solid-js/store";
+import { createStore, produce } from "solid-js/store";
 import { FaSolidAngleUp, FaSolidXmark, FaSolidAngleDown, FaSolidExclamation } from 'solid-icons/fa'
-import { Store } from "../../utils";
-import { Block, BlockType, getBlockData, processData } from "./blocks";
+import { Block, BlockPrimitive, BlockType, nodeRecord, processData, Store } from "./blocks";
 import { InputNode } from "../../nodes/InputNode";
 
 const example_workspace_caesar: Store = {
     text: "Hello, World!",
     blocks: [
-        {
-            type: "format",
-            data: {
-                case: FormattingMode.LowerCaseFormatting,
-                removeUnknown: false,
-            }
-        },
-        {
-            type: "frequency_analysis"
-        },
-        {
-            type: "caesar_cipher",
-            data: {
-                steps: 0
-            }
-        },
-        {
-            type: "frequency_analysis",
-        },
-        {
-            type: "format",
-            data: {
-                case: FormattingMode.SentenceCaseFormatting,
-                removeUnknown: false
-            }
-        },
+        // {
+        //     type: "format",
+        //     data: {
+        //         case: FormattingMode.LowerCaseFormatting,
+        //         removeUnknown: false,
+        //     }
+        // },
+        // {
+        //     type: "frequency_analysis"
+        // },
+        // {
+        //     type: "caesar_cipher",
+        //     data: {
+        //         steps: 0
+        //     }
+        // },
+        // {
+        //     type: "frequency_analysis",
+        // },
+        // {
+        //     type: "format",
+        //     data: {
+        //         case: FormattingMode.SentenceCaseFormatting,
+        //         removeUnknown: false
+        //     }
+        // },
         {
             type: "output",
         }
     ],
 }
-const example_workspace_substitution: Store = {
-    "text": "Hello, World!",
-    "blocks": [
-        {
-            type: "substitution_cipher",
-            data: {
-                subsitution: {}
-            }
-        },
-        {
-            "type": "output"
-        }
-    ]
-}
+// const example_workspace_substitution: Store = {
+//     "text": "Hello, World!",
+//     "blocks": [
+//         {
+//             type: "substitution_cipher",
+//             data: {
+//                 subsitution: {}
+//             }
+//         },
+//         {
+//             "type": "output"
+//         }
+//     ]
+// }
 
-const example_workspace_shift: Store = {
-    "text": "Hello, World!",
-    "blocks": [
-        {
-            type: "caesar_cipher",
-            data: {
-                steps: 2
-            }
-        },
-        {
-            "type": "output"
-        }
-    ]
-}
+// const example_workspace_shift: Store = {
+//     "text": "Hello, World!",
+//     "blocks": [
+//         {
+//             type: "caesar_cipher",
+//             data: {
+//                 steps: 2
+//             }
+//         },
+//         {
+//             "type": "output"
+//         }
+//     ]
+// }
 
 export function Workspace() {
     const [store, setStore] = createStore<Store>(example_workspace_caesar)
@@ -79,7 +78,7 @@ export function Workspace() {
 
     let processDebounceTimer: number | null;
 
-    const blockdata = getBlockData(store, setStore)
+    // const blockdata = getBlockData(store, setStore)
     createEffect(() => {
         // This is really disgusting, there should be another way of doing this.
         JSON.stringify(store.text)
@@ -111,8 +110,8 @@ export function Workspace() {
             <For each={store.blocks}>{(node, blockIndex) => {
                 const data = () => dataStack().at(node.input ?? 0) ?? ""
 
-                if (node.type in blockdata) {
-                    const thisblock = blockdata[node.type]
+                if (node.type in nodeRecord) {
+                    const thisblock = nodeRecord[node.type]
                     return <Card>
                         <CardHeader>
                             <div class="flex gap-1">
@@ -168,7 +167,13 @@ export function Workspace() {
                                     <button class="bg-red-400 rounded px-2 py-1 mt-2" onClick={reset}>Reset</button>
                                 </div>
                             }}>
-                                {thisblock.component(node, data, blockIndex)}
+                                {thisblock.component({
+                                    block: node,
+                                    text: data,
+                                    setter: (state) =>
+                                        setStore("blocks", blockIndex(), produce(state as any))
+
+                                })}
                             </ErrorBoundary>
                         </CardContent>
                     </Card>
@@ -178,29 +183,29 @@ export function Workspace() {
 
             <Card class="p-4">
                 <div class="mt-2 mb-3">
-                    <CardTitle>More Blocks:</CardTitle>
+                    <CardTitle>Add Blocks:</CardTitle>
                 </div>
                 <div class="flex flex-row flex-wrap gap-2 h-min">
-                <For each={Object.entries(blockdata)}>{([type, data]) =>
-                    <button type="button" class="group relative" onClick={() => {
-                        const object: Partial<Block> = {
-                            type: type as BlockType
-                        }
-                        if (data.init) {
-                            (object as any).data = data.init()
-                        }
-                        setStore("blocks", store.blocks.length, object)
-                    }}>
-                        <div class="border hover:bg-slate-100 cursor-pointer rounded-lg h-12 flex items-center justify-center">
-                            <span class="mx-2 text-sm">
-                                {data.title}
-                            </span>
-                        </div>
-                        {/* <div class="hidden group-hover:flex group-focus:flex pt-3 absolute left-full ml-2 top-0 border z-20 bg-slate-200 p-2 rounded-lg h-12 w-auto">
+                    <For each={Object.entries(nodeRecord)}>{([type, data]) =>
+                        <button type="button" class="group relative" onClick={() => {
+                            const object: Partial<Block> = {
+                                type: type as BlockType
+                            }
+                            if (data.init) {
+                                (object as any).data = data.init()
+                            }
+                            setStore("blocks", store.blocks.length, object)
+                        }}>
+                            <div class="border hover:bg-slate-100 cursor-pointer rounded-lg h-12 flex items-center justify-center">
+                                <span class="mx-2 text-sm">
+                                    {data.title}
+                                </span>
+                            </div>
+                            {/* <div class="hidden group-hover:flex group-focus:flex pt-3 absolute left-full ml-2 top-0 border z-20 bg-slate-200 p-2 rounded-lg h-12 w-auto">
                             <p class="text-sm whitespace-nowrap font-semibold">{data.title}</p>
                         </div> */}
-                    </button>
-                }</For>
+                        </button>
+                    }</For>
                 </div>
             </Card>
         </div>

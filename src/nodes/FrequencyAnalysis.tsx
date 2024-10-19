@@ -1,16 +1,16 @@
 import { BarChart } from "~/components/ui/charts";
 import { createEffect, createSignal } from "solid-js";
 import { ChartData, ChartOptions } from "chart.js";
-import { BlockData } from "~/tools/Workspace/blocks";
+import { BlockPrimitive, WorkspaceNodeInfo, WorkspaceNodeProps } from "~/tools/Workspace/blocks";
 import { corpusMonograms } from "~/globalstate";
 
-export interface FrequencyAnalysisBlockData extends BlockData {
+export interface FrequencyAnalysisBlockData extends BlockPrimitive {
   type: "frequency_analysis"
 }
 
 const letters = ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z"]
 
-export function FrequencyAnalysis({ text }: { text: () => string; }) {
+export function FrequencyAnalysis({ text }: WorkspaceNodeProps<FrequencyAnalysisBlockData>) {
   const [monograms, setMonograms] = createSignal<any>({});
   createEffect(async () => {
     setMonograms(await CountMonograms(text()));
@@ -72,3 +72,9 @@ export function FrequencyAnalysis({ text }: { text: () => string; }) {
     </div>
   </div>;
 }
+
+export default {
+  title: "Frequency Analysis",
+  description: "Count the frequency of Monograms",
+  component: FrequencyAnalysis,
+} as WorkspaceNodeInfo<FrequencyAnalysisBlockData>

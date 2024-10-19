@@ -1,11 +1,11 @@
 import { createSignal } from "solid-js";
-import { BlockData } from "~/tools/Workspace/blocks";
+import { BlockPrimitive, WorkspaceNodeInfo, WorkspaceNodeProps } from "~/tools/Workspace/blocks";
 
-export interface HighlightBlockData extends BlockData {
+export interface HighlightBlockData extends BlockPrimitive {
   type: "highlight"
 }
 
-export function Highlight({ text }: { text: () => string; }) {
+function Highlight({ text }: WorkspaceNodeProps<HighlightBlockData>) {
   const [highlighted, setHighlighted] = createSignal("");
   return <div class="">
     <input class="border" value={highlighted()} onInput={(e) => setHighlighted(e.currentTarget.value)}></input>
@@ -24,3 +24,9 @@ export function Highlight({ text }: { text: () => string; }) {
     </div>
   </div>;
 }
+
+export default {
+  title: "Highlight",
+  description: "Highlight text",
+  component: Highlight
+} as WorkspaceNodeInfo<HighlightBlockData>
