@@ -140,13 +140,11 @@ export function CountNGramsTool() {
                                 <tr class="whitespace-nowrap">
                                     <th>ngram</th>
                                     <th>corpus (%)</th>
-                                    <th>corpus (%)</th>
                                 </tr>
                                 <For each={sortedCorpusGrams()}>{([k, v]) =>
                                     <tr>
                                         <td>{k}</td>
                                         <td>{Math.round(v / corpusNGramTotal() * 100 * 100) / 100}</td>
-                                        <td>{Math.round(((corpusNGramData() ?? {})[k] ?? 0) / corpusNGramTotal() * 100 * 100) / 100}</td>
                                     </tr>
                                 }</For>
                             </tbody>
