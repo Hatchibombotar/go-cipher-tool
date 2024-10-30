@@ -7,7 +7,7 @@ export interface IndexOfCoincidenceBlockData extends BlockPrimitive {
   }
 }
 
-function IndexOfCoincidence({ text, block }: WorkspaceNodeProps<IndexOfCoincidenceBlockData>) {
+function IndexOfCoincidence({ block }: WorkspaceNodeProps<IndexOfCoincidenceBlockData>) {
   return <div class="">
     <div class="h-96">
       <p class="font-semibold text-lg">

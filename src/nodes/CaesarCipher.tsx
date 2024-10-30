@@ -1,5 +1,5 @@
 import { Slider, SliderFill, SliderThumb, SliderTrack } from "~/components/ui/slider";
-import { createEffect, createSignal } from "solid-js";
+import { createSignal } from "solid-js";
 import { BlockPrimitive, WorkspaceNodeInfo, WorkspaceNodeProps } from "~/tools/Workspace/blocks";
 
 export interface CaesarCipherBlockData extends BlockPrimitive {

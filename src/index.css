@@ -165,7 +165,6 @@ body {
 
 
 .ngram-table {
-  @apply w-72;
   table-layout: fixed;
   font-family: monospace;
   border-collapse: collapse;

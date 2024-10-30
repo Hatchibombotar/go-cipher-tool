@@ -3,7 +3,7 @@ declare global {
 
     function CountMonograms(arg1: string): Promise<{ [key: string]: number }>;
 
-    function CountNGrams(arg1: string, size: number): Promise<{ [key: string]: number }>;
+    function CountNGrams(text: string, size: number): Promise<{ [key: string]: number }>;
 
     function DecodeCaesarCipher(arg1: string, arg2: number): Promise<string>;
 

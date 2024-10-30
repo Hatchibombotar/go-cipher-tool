@@ -6,7 +6,7 @@ import AffineNode, { AffineCipherBlockData } from "~/nodes/AffineCipher";
 import OutputNode, { OutputBlockData } from "~/nodes/Output";
 import CaesarCipherNode, { CaesarCipherBlockData } from "~/nodes/CaesarCipher";
 import FrequencyAnalysisNode, { FrequencyAnalysisBlockData } from "~/nodes/FrequencyAnalysis";
-import NGramAnalysisNode, { NGramBlockData } from "~/nodes/NGramAnalysis";
+// import NGramAnalysisNode, { NGramBlockData } from "~/nodes/NGramAnalysis";
 import IndexOfCoincidence, { IndexOfCoincidenceBlockData } from "~/nodes/IndexOfCoincidence";
 import SubstitutionCipher, { SubstitutionCipherBlockData } from "~/nodes/SubstitutionCipher";
 import FormatNode, { FormatBlockData } from "~/nodes/Format";
@@ -19,7 +19,7 @@ export const nodeRecord = {
   affine_cipher: AffineNode,
   caesar_cipher: CaesarCipherNode,
   frequency_analysis: FrequencyAnalysisNode,
-  count_n_grams: NGramAnalysisNode,
+  // count_n_grams: NGramAnalysisNode,
   index_of_coincidence: IndexOfCoincidence,
   substitution_cipher: SubstitutionCipher,
   format: FormatNode,
@@ -34,7 +34,7 @@ export type Block =
     AffineCipherBlockData |
     CaesarCipherBlockData |
     FrequencyAnalysisBlockData |
-    NGramBlockData |
+    // NGramBlockData |
     IndexOfCoincidenceBlockData |
     SubstitutionCipherBlockData | 
     FormatBlockData |
@@ -55,7 +55,7 @@ export type WorkspaceNodeInfo<T extends BlockPrimitive> = {
   description: string,
   component: (props: WorkspaceNodeProps<T>) => JSX.Element,
   process?: (block: T, previous: string, index: number, setter: (func: (block: T) => void) => void ) => Promise<string>,
-  init?: () => T["data"] // TODO: should this be just to T?
+  init?: () => T["data"]
 }
 
 export type WorkspaceNodeProps<T extends BlockPrimitive> = {
@@ -65,7 +65,7 @@ export type WorkspaceNodeProps<T extends BlockPrimitive> = {
 }
 
 export interface BlockPrimitive {
-  // type: BlockType,
+  type: string,
   input?: number,
   data?: any,
   error?: Error,

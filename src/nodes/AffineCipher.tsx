@@ -1,5 +1,5 @@
 import { Switch, SwitchControl, SwitchThumb, SwitchLabel } from "~/components/ui/switch";
-import { createEffect, createSignal, JSX, Show } from "solid-js";
+import { createEffect, createSignal, Show } from "solid-js";
 import {  BlockPrimitive, WorkspaceNodeInfo, WorkspaceNodeProps } from "~/tools/Workspace/blocks";
 
 function AffineCipher({ block, setter }: WorkspaceNodeProps<AffineCipherBlockData>) {

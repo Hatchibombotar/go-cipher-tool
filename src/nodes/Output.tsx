@@ -1,7 +1,7 @@
 import { BlockPrimitive, WorkspaceNodeInfo } from "~/tools/Workspace/blocks";
 
 export interface OutputBlockData extends BlockPrimitive {
-  type: "output"
+  type: "output",
 }
 
 export function Output({ text }: { text: () => string; }) {

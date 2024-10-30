@@ -3,11 +3,12 @@ import { Workspace } from "./tools/Workspace/Workspace";
 import { Transposition } from "./tools/Transposition";
 import { InferSpacesTool } from "./tools/InferSpacesTool";
 import { setCorpusMonograms, setCorpusRaw } from "./globalstate";
+import { CountNGramsTool } from "./tools/CountNGramsTool";
 
 declare let Ready: any
 
 function App() {
-  const [tab, setTab] = createSignal<"workspace" | "transposition" | "infer-spaces">("workspace")
+  const [tab, setTab] = createSignal<"workspace" | "transposition" | "infer-spaces" | "count-n-grams">("workspace")
   const [loadingMessage, setLoadingMessage] = createSignal<string | null>("Loading")
 
 
@@ -52,6 +53,7 @@ function App() {
           <button onClick={() => setTab("workspace")} classList={{ "underline": tab() == "workspace" }} class="hover:underline cursor-pointer">workspace</button>
           <button onClick={() => setTab("transposition")} classList={{ "underline": tab() == "transposition" }} class="hover:underline cursor-pointer">transposition</button>
           <button onClick={() => setTab("infer-spaces")} classList={{ "underline": tab() == "infer-spaces" }} class="hover:underline cursor-pointer">infer-spaces</button>
+          <button onClick={() => setTab("count-n-grams")} classList={{ "underline": tab() == "count-n-grams" }} class="hover:underline cursor-pointer">count-n-grams</button>
         </div>
       </div>
       <hr class="mx-6 mt-2"></hr>
@@ -71,6 +73,9 @@ function App() {
           </Show>
           <Show when={tab() == "infer-spaces"}>
             <InferSpacesTool />
+          </Show>
+          <Show when={tab() == "count-n-grams"}>
+            <CountNGramsTool/>
           </Show>
         </div>
       </Show>

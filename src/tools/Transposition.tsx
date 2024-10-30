@@ -1,6 +1,6 @@
-import { createEffect, createSignal, For, onCleanup, onMount } from "solid-js";
+import { createSignal, For } from "solid-js";
 import { InputNode } from "../nodes/InputNode";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card";
 import { createSwapy } from 'swapy'
 import {
     NumberField,
@@ -8,7 +8,6 @@ import {
     NumberFieldIncrementTrigger,
     NumberFieldInput
 } from "~/components/ui/number-field"
-import { FaSolidArrowLeft, FaSolidArrowRight } from "solid-icons/fa";
 import { Textarea } from "~/components/ui/textarea";
 
 export function Transposition() {

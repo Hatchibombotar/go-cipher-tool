@@ -4,18 +4,20 @@ import { corpusNGrams, corpusRaw, setCorpusNGrams } from "~/globalstate";
 
 export interface NGramBlockData extends BlockPrimitive {
   type: "count_n_grams",
-  size: number
+  ngrams: Record<string, number>
+  data: {
+    size: number,
+  }
 }
 
-export function NGramAnalysis({ text, block, }: WorkspaceNodeProps<NGramBlockData>) {
+export function NGramAnalysis({ text, block, setter }: WorkspaceNodeProps<NGramBlockData>) {
   const [ngrams, setNGrams] = createSignal<Record<string, number>>({});
-  const [ngramSize, setNGramSize] = createSignal(block.size ?? 2)
+  const [ngramSize, setNGramSize] = createSignal(block.data.size ?? 2)
 
   createEffect(async () => {
-    // setBlockData(old => {
-
-    // })
-    block.size = ngramSize()
+    setter((block) => {
+      block.data.size = ngramSize()
+    })
     await initNGramsIfNotDone(ngramSize())
 
     setNGrams(await CountNGrams(text(), ngramSize()));
@@ -32,7 +34,7 @@ export function NGramAnalysis({ text, block, }: WorkspaceNodeProps<NGramBlockDat
     return true
   }
 
-  const ngramTotal = () => Object.values(ngrams()).reduce((prev, current) => prev + current, 0)
+  const ngramTotal = () => Object.values(block.ngrams).reduce((prev, current) => prev + current, 0)
 
   return <div class="">
     <input type="number" class="border my-2 rounded w-8 h-8 text-center" min={1} value={ngramSize()} onInput={async (e) => setNGramSize(e.currentTarget.valueAsNumber)}></input>
@@ -46,7 +48,7 @@ export function NGramAnalysis({ text, block, }: WorkspaceNodeProps<NGramBlockDat
             <th>input (%)</th>
             <th>corpus (%)</th>
           </tr>
-          <For each={Object.entries(ngrams()).toSorted(([, a], [, b]) => b - a)}>{([k, v]) =>
+          <For each={Object.entries(block.ngrams).toSorted(([, a], [, b]) => b - a)}>{([k, v]) =>
             <tr>
               <td>{k}</td>
               <td>{v}</td>
@@ -65,6 +67,15 @@ export default {
   description: "Encode/Decode",
   component: NGramAnalysis,
   init() {
-    return {}
-  }
+    return {
+      size: 2
+    }
+  },
+  async process(block, previous, index, setter) {
+    const ngrams = await CountNGrams(previous, block.data.size ?? 2)
+    setter((block) => {
+      block.ngrams = ngrams
+    })
+    return previous
+  },
 } as WorkspaceNodeInfo<NGramBlockData>
