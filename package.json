@@ -30,7 +30,7 @@
     "clsx": "^2.1.1",
     "solid-icons": "^1.1.0",
     "solid-js": "^1.8.11",
-    "swapy": "^0.2.1",
+    "swapy": "^0.4.2",
     "tailwind-merge": "^2.3.0",
     "tailwindcss-animate": "^1.0.7"
   },

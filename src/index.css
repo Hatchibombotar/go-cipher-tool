@@ -142,10 +142,7 @@ body {
 
 
 .custom-table {
-  table-layout: fixed;
   font-family: monospace;
-  border-collapse: collapse;
-  width: 100%;
 }
 
 .custom-table td, .custom-table th {
