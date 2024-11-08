@@ -7,7 +7,7 @@ export interface OutputBlockData extends BlockPrimitive {
 export function Output({ text }: { text: () => string; }) {
   return <div class="">
     <div class="">
-      <p>{text()}</p>
+      <textarea readOnly class="w-full h-96">{text()}</textarea>
     </div>
   </div>;
 }
