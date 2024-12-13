@@ -101,9 +101,7 @@
   }
   body {
     @apply bg-background text-foreground;
-    font-feature-settings:
-      "rlig" 1,
-      "calt" 1;
+    font-feature-settings: "rlig" 1, "calt" 1;
   }
 }
 
@@ -117,15 +115,16 @@
   tr {
     height: 30px;
   }
-  th, td {
+  th,
+  td {
     text-align: center;
     width: 30px;
   }
   th {
-    @apply font-medium
+    @apply font-medium;
   }
   td {
-    @apply border
+    @apply border;
   }
 
   td > input {
@@ -136,30 +135,29 @@
 }
 
 body {
-  @apply bg-slate-50
+  @apply bg-slate-50;
 }
-
-
 
 .custom-table {
   font-family: monospace;
 }
 
-.custom-table td, .custom-table th {
+.custom-table td,
+.custom-table th {
   border: 1px solid #ddd;
   text-align: center;
 }
 
-
-.custom-table tr:hover {background-color: #ddd;}
+.custom-table tr:hover {
+  background-color: #ddd;
+}
 
 .custom-table th {
   padding-top: 12px;
   padding-bottom: 12px;
-  background-color: #04AA6D;
+  background-color: #04aa6d;
   color: white;
 }
-
 
 .ngram-table {
   /* table-layout: fixed; */
@@ -168,7 +166,8 @@ body {
   height: min-content;
 }
 
-.ngram-table td, .ngram-table th {
+.ngram-table td,
+.ngram-table th {
   border: 1px solid #ddd;
   text-align: center;
 }
@@ -180,4 +179,21 @@ body {
 
 .ngram-table tr {
   height: 24px;
+}
+
+.stickyhead {
+  table {
+    text-align: left;
+    position: relative;
+    border-collapse: collapse;
+  }
+  th,
+  td {
+    padding: 0.25rem;
+  }
+  th {
+    position: sticky;
+    top: 0; /* Don't forget this, required for the stickiness */
+    box-shadow: 0 2px 2px -1px rgba(0, 0, 0, 0.4);
+  }
 }

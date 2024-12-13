@@ -140,7 +140,7 @@ export function Transposition() {
             </CardContent>
         </Card>
 
-        <table ref={container} class="custom-table select-auto text-center">
+        <table ref={container} class="custom-table stickyhead select-auto text-center">
             <thead>
                 <tr class="text-center select-none">
                     <For each={columnOrder()}>{(columnNumber, columnIndex) =>
