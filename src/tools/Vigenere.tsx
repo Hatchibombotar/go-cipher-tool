@@ -8,9 +8,11 @@ import {
     NumberFieldInput
 } from "~/components/ui/number-field"
 import { Textarea } from "~/components/ui/textarea";
+import { Checkbox } from "~/components/ui/checkbox";
 
 type ColData = {
-    shift: number
+    shift: number,
+    checked: boolean
 }
 export function Vigenere() {
     const [inputText, setInputText] = createSignal("MYMLZ VUKCM LFSHM QHIBW PQCZB LWQEI KPHWX TLGGZ BLZHM ILTTE AJMGQ EHAFH ROEZN CLLTX JFILV RYWBL KZATQ VQDOL ZUIZE LRTWC QPKTH TWWAZ MYMYM WTRFL GACKE ILMKZ BXDLR RFLAH WOMYL ZWCMI VNSWF WLZUT LRTGP EFPVA YKADB SMYMB LLCIO BSUIN MYMZV VOIGG ZQLKI OPPYK WUELG BCZAQ SJZOB RUDYH VYSZM PMGQL MZWCP RVRWD WGMIJ PBEOU ZVEVR LGSEM BHBKP XELCJ ZWXWE YMPIJ KPCEP UOFQI YMBSX IXGZZ QTOLA RRXWF EUETW PNVOV LRSKM YVFVU WMEKH ZWSVJ XZLRT IZVGT ILLKI BMXBJ RJDXU LQZSQ MIAFE KQUTR VYWKL HRNML MDWHA LGISS FBXCQ YZNMG PXQYO HHHRO WEAVL XLQQE RLZHR RICFZ OWEAG CZWFV YZQYW VMSHI TVHZW KMILF VFUBF RKKML GEIDU AEZKP EIFZB SFBAV GEAVV ISMUT CFXOM XBHHL TSMIN ZYWDB XJAAK VISEL GFBDQ ZMIVP KJQCD YEYOK AWYVB THEED FPFSS LZRWZ QYTGT PNIVF DJGIM ONCHD BWPZK FZWFF INPZK KWUOM TVQLA QXZZG XEBXZ RKKGW WPWCQ RACGJ YPKBS DQWLV BDNTP PAVGT WGMVK ZUNHL TSMIC CZGOH HOWDN WNTCE PPVSJ PLJEP OVZVT ZGEHZ WQEOC CXFNI SIFZG HDDCJ NEAVO TXEVK VWWAL DJTMZ WCTXY FIDVE IQMCR YIGOJ QIOFQ RRZBZ UVAJC IQWWL KVEAM ERRVS TJURM LZHVZ ELLRV NPZKU SFUHS AIAEF BQJXJ VFSBD LNBZL KMPWX JVRAS PSILE AVVIS IQKVW JWAJX LKKQT DAQLZ VTHPD SPEPB DCICT HXGUG ZNFEC GQLFD RUWSQ HKIWF VZHES PJSWE UIHIC DRJAJ WCEUM AQIVJ ZNKBW PWGTI JAWCJ NEAVL XLQQE RTMWM NCDIV KIELC KHZAV MNUPK VTNLH KJDDS BSABS XWIBZ YUCMH ZOIBU LMZKQ CMVZG ZKSMM QEMYM NFRFF ITLHH GGSTM MXYTN RQWSQ YHJPK FNBPE ULFWK LROMY WVLIZ TTFHW UWMOJ FMVDT YXJVM USQRJ BSTMM UZVGJ SWFHZ ZZJXM MCEYC CWLQL JOPPW ZIBZR FNSJW WSWMW XWBPW SPVTG JDRTT PGXBW ZJVZA WLKII QEPFC AOFGY WYZOC QCWGV ZPMPG KCLZH JOQEB JAPQI KKVAF NXJID LLUTE LCKHZ WJYVZ OLRZT FRFVF KLUMX BTGJB GFGVZ CFKQS OBZEV IKPMV RZGFH FPBTM ZACZX FZTXA FYGBE HZUPR MPVGA LXEOQ ZGJQC HLKTV LZHCR WFEUJ TQSTT SVLRH JAZGF ZLLCU NVAUK EIIRB CMBTR FTCMD GJDVO MFMCR MPVSJ KXGCI DBKCP EMQEY SAVIM")
@@ -27,7 +29,8 @@ export function Vigenere() {
                 const i = Number(iString)
                 if (i >= colData().length) {
                     currentShifts.push({
-                        shift: 0
+                        shift: 0,
+                        checked: false
                     })
                 }
             }
@@ -38,36 +41,32 @@ export function Vigenere() {
     const formattedInput = () => inputText().toLowerCase().replace(/ /g, "").replace(/\n/g, "")
     const rows = () => Math.ceil(formattedInput().length / keyLength())
 
-    const possibleColumnCounts = () => {
-        const num = formattedInput().length
-        const factors = [];
-
-        for (let i = 1; i <= Math.sqrt(num); i++) {
-            if (num % i === 0) {
-                factors.push(i);
-                if (i !== num / i) { // To avoid adding the square root twice for perfect squares
-                    factors.push(num / i);
-                }
-            }
-        }
-
-        return factors.sort((a, b) => a - b);
-    }
-
     let container!: HTMLTableElement;
 
     const [highlight, setHighlight] = createSignal("")
 
     const getResult = () => {
         let result = ""
-        // for (const rowS in new Array(rows()).fill(null)) {
-        //     const row = Number(rowS)
-        //     for (const col of columnOrder()) {
-        //         result += formattedInput()[(row * keyLength()) + col] ?? ""
-        //     }
-        // }
         return result
     }
+    const [spacedresult, setSpacedResult] = createSignal("")
+    createEffect(async () => {
+        let result = ""
+        for (let row = 0; row < rows(); row++) {
+            for (const col in colData()) {
+                const data = colData()[col]
+                if (data.checked) {
+                    const char = formattedInput()[(row * keyLength()) + Number(col)]
+                    const newchar = await DecodeCaesarCipher(char, data.shift)
+                    result += newchar
+                } else {
+                    result += " "
+                }
+            }
+            result += "\n"
+        }
+        setSpacedResult(result)
+    })
 
     function copy() {
         const htmlContent = container.outerHTML
@@ -86,7 +85,7 @@ export function Vigenere() {
         const current = colData()
         current[index].shift += 1
         current[index].shift = current[index].shift % 26
-        current[index] = {...current[index]}
+        current[index] = { ...current[index] }
         setColData([...current])
     }
 
@@ -94,7 +93,13 @@ export function Vigenere() {
         const current = colData()
         current[index].shift -= 1
         current[index].shift = current[index].shift % 26
-        current[index] = {...current[index]}
+        current[index] = { ...current[index] }
+        setColData([...current])
+    }
+
+    function setChecked(index: number, isChecked: boolean) {
+        const current = colData()
+        current[index].checked = isChecked
         setColData([...current])
     }
 
@@ -144,14 +149,16 @@ export function Vigenere() {
             <thead>
                 <tr class="text-center select-none">
                     <For each={colData()}>{(col, columnIndex) =>
-                        <th class="max-w-32">
+                        <th class="max-w-32 text-center">
                             <div class="grid grid-cols-2">
                                 <button onClick={() => moveLeft(columnIndex())}>{"<"}</button>
                                 <button onClick={() => moveRight(columnIndex())}>{">"}</button>
                             </div>
                             <p>{columnIndex()}</p>
                             <p>{cipherShiftToCharacter(-col.shift)}({col.shift})</p>
-                            
+                            <div class="w-full flex items-center justify-center">
+                                <Checkbox class="" onChange={(checked) => setChecked(columnIndex(), checked)} />
+                            </div>
                             {/* <p class="underline cursor-pointer">analysis</p> */}
                         </th>
                     }</For>
@@ -188,6 +195,10 @@ export function Vigenere() {
             <CardHeader class="pb-2 pt-5">
                 <CardTitle>Result</CardTitle>
             </CardHeader>
+            <CardContent>
+                <textarea readOnly class="w-full h-96 font-mono">{spacedresult()}</textarea>
+
+            </CardContent>
             <CardContent>
                 <p class="break-all">{getResult()}</p>
             </CardContent>
