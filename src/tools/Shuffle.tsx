@@ -13,6 +13,7 @@ import { ChartData, ChartOptions } from "chart.js";
 import { corpusMonograms } from "~/globalstate";
 import { BarChart } from "~/components/ui/charts";
 import { corpus_data } from "~/utils";
+import { Switch, SwitchControl, SwitchThumb, SwitchLabel } from "~/components/ui/switch";
 
 const alphabetplus = 'abcdefghijklmnopqrstuvwxyz0123456789'.split('');
 
@@ -44,22 +45,6 @@ export function Shuffle() {
         }
         setStringKey(JSON.stringify(columnOrder()))
     })
-
-    const possibleColumnCounts = () => {
-        const num = challenge.length
-        const factors = [];
-
-        for (let i = 1; i <= Math.sqrt(num); i++) {
-            if (num % i === 0) {
-                factors.push(i);
-                if (i !== num / i) { // To avoid adding the square root twice for perfect squares
-                    factors.push(num / i);
-                }
-            }
-        }
-
-        return factors.sort((a, b) => a - b);
-    }
 
     let container!: HTMLTableElement;
 
@@ -205,6 +190,16 @@ export function Shuffle() {
         },
     };
 
+    const [keySymmetry, setKeySymmetry] = createSignal(false)
+
+    createEffect(makeSymmetrical)
+    function makeSymmetrical() {
+        const neworder = columnOrder().slice(0, 11)
+        console.log(neworder)
+        for (let i = 0; i < 10; i++) {
+            console.log(i)
+        }
+    }
 
     return <div class="min-h-full flex gap-2 flex-col w-full">
         <Card>
@@ -227,6 +222,13 @@ export function Shuffle() {
                     setColumnOrder(val)
 
                 }}></input>
+
+                <Switch class="flex items-center gap-2 my-2" onChange={(isChecked) => setKeySymmetry(isChecked)} defaultChecked={keySymmetry()}>
+                    <SwitchControl>
+                        <SwitchThumb />
+                    </SwitchControl>
+                    <SwitchLabel>Key Symmetry</SwitchLabel>
+                </Switch>
             </CardContent>
         </Card>
 
@@ -239,8 +241,8 @@ export function Shuffle() {
                             <For each={columnOrder()}>{(columnNumber, columnIndex) =>
                                 <th class="max-w-32">
                                     <div class="grid grid-cols-2">
-                                        <button onClick={() => moveLeft(columnIndex())}>{"<"}</button>
-                                        <button onClick={() => moveRight(columnIndex())}>{">"}</button>
+                                        <button classList={{"text-red-500 cursor-not-allowed": keySymmetry() && columnIndex() > columns/2}} onClick={() => (!(keySymmetry() && columnIndex() > columns/2)) && moveLeft(columnIndex())}>{"<"}</button>
+                                        <button classList={{"text-red-500 cursor-not-allowed": keySymmetry() && columnIndex() > columns/2}} onClick={() => (!(keySymmetry() && columnIndex() > columns/2)) && moveRight(columnIndex())}>{">"}</button>
                                     </div>
                                     <span>{columnNumber}</span>
                                 </th>
