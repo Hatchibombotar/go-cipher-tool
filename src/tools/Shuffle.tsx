@@ -11,13 +11,15 @@ import { Textarea } from "~/components/ui/textarea";
 import challenge from "./challenge";
 
 const expectedthings =
-"/".charCodeAt(0)
-+ "|".charCodeAt(0)
-+ "\\".charCodeAt(0)
+    "/".charCodeAt(0)
+    + "|".charCodeAt(0)
+    + "\\".charCodeAt(0)
 
 export function Shuffle() {
     const columns = 21
     const [columnOrder, setColumnOrder] = createSignal<number[]>([])
+
+    const [stringKey, setStringKey] = createSignal("")
 
     const rows = () => Math.ceil(challenge.length / columns)
 
@@ -33,6 +35,7 @@ export function Shuffle() {
             currentOrder = currentOrder.filter(x => x < columns)
             setColumnOrder([...currentOrder])
         }
+        setStringKey(JSON.stringify(columnOrder()))
     })
 
     const possibleColumnCounts = () => {
@@ -52,8 +55,6 @@ export function Shuffle() {
     }
 
     let container!: HTMLTableElement;
-
-    const [highlight, setHighlight] = createSignal("")
 
     const getResult = () => {
         let result = ""
@@ -113,6 +114,20 @@ export function Shuffle() {
             <CardContent>
                 <button onClick={copy} class="bg-black text-white rounded-md py-1 px-2 mt-4">Copy Table</button>
                 <button onClick={() => setColumnOrder([])} class="bg-black text-white rounded-md py-1 px-2 mt-4 ml-1">Reset Order</button>
+
+
+                <span class="font-semibold text-sm block">Key</span>
+                <input type="text" class="border rounded h-8 block px-2 w-full" value={stringKey()} onInput={(e) => {
+                    const val = JSON.parse(e.currentTarget.value) as number[]
+                    const total = (prev: any, cur: any) => prev + cur
+                    if (val.reduce(total) != columnOrder().reduce(total)) {
+                        return
+                    }
+
+                    setColumnOrder(val)
+
+                    
+                }}></input>
             </CardContent>
         </Card>
 
