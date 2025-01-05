@@ -7,10 +7,11 @@ import { CountNGramsTool } from "./tools/CountNGramsTool";
 import { FullAnalysis } from "./tools/FullAnalysis";
 import { Substitutiton } from "./tools/Substitution";
 import { Vigenere } from "./tools/Vigenere";
+import { Shuffle } from "./tools/Shuffle";
 
 declare let Ready: any
 
-const tabs = ["workspace", "transposition", "infer-spaces", "count-n-grams", "full-analysis", "substitution", "vigenere"] as const
+const tabs = ["workspace", "transposition", "infer-spaces", "count-n-grams", "full-analysis", "substitution", "vigenere", "shuffle"] as const
 
 function App() {
   const [tab, setTab] = createSignal<typeof tabs[number]>("workspace")
@@ -89,6 +90,9 @@ function App() {
           </Show>
           <Show when={tab() == "vigenere"}>
             <Vigenere />
+          </Show>
+          <Show when={tab() == "shuffle"}>
+            <Shuffle />
           </Show>
         </div>
       </Show>
