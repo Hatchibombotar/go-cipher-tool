@@ -1,4 +1,4 @@
-import { createEffect, createSignal, For, Index, onCleanup, onMount } from "solid-js";
+import { createEffect, createMemo, createSignal, For, Index, onCleanup, onMount, Show } from "solid-js";
 import { InputNode } from "../nodes/InputNode";
 import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card";
 import {
@@ -59,12 +59,12 @@ export function Shuffle() {
         return result
     }
 
-    const getADFGVXResult = () => {
+    const getADFGVXResult = createMemo(() => {
         return threeNeedleTelegraph(getNeedleResult())
-    }
-    const getTextResult = () => {
+    })
+    const getTextResult = createMemo(() => {
         return adfgvxtotext(getADFGVXResult())
-    }
+    })
 
     const getBestFit = () => {
         const text = getTextResult()
@@ -190,15 +190,67 @@ export function Shuffle() {
         },
     };
 
-    const [keySymmetry, setKeySymmetry] = createSignal(false)
+    // const [keySymmetry, setKeySymmetry] = createSignal(false)
 
-    createEffect(makeSymmetrical)
-    function makeSymmetrical() {
+    // createEffect(makeSymmetrical)
+    // function makeSymmetrical() {
+    //     const neworder = columnOrder().slice(0, 11)
+    //     console.log(neworder)
+    //     for (let i = 0; i < 10; i++) {
+    //         console.log(i)
+    //     }
+    // }
+
+    function isKeySymmetrical() {
         const neworder = columnOrder().slice(0, 11)
         console.log(neworder)
-        for (let i = 0; i < 10; i++) {
-            console.log(i)
+
+        let isSymmetrical = true
+        for (let i = 0; i < 11; i++) {
+            // console.log(columnOrder()[i])
+            // console.log()
+            // console.log(i, 20-i)
+            if (columnOrder()[i] != 20 - columnOrder()[20-i]) {
+                isSymmetrical = false
+                break
+            }
         }
+
+        return isSymmetrical
+    }
+
+    function getFrequenciesForADFGVXColumn(column: number) {
+        const text = getADFGVXResult()
+        const frequencies: Record<string, number> = {}
+        for (let i = column; i <= text.length; i += 7) {
+            const char = text[i]
+            frequencies[char] = (frequencies[char] ?? 0) + 1
+        }
+        return frequencies
+    }
+
+    function getAverageADFGVXColumnFrequencies() {
+        const cols = 7
+        const total = {
+            A: 0, D: 0, F: 0, G: 0, V: 0, X: 0
+        }
+        for (let i = 0; i < cols; i++) {
+            const f = getFrequenciesForADFGVXColumn(i)
+            total.A += f.A
+            total.D += f.D
+            total.F += f.F
+            total.G += f.G
+            total.V += f.V
+            total.X += f.X
+        }
+        total.A /= cols
+        total.D /= cols
+        total.F /= cols
+        total.G /= cols
+        total.V /= cols
+        total.X /= cols
+
+        return total
     }
 
     return <div class="min-h-full flex gap-2 flex-col w-full">
@@ -223,12 +275,10 @@ export function Shuffle() {
 
                 }}></input>
 
-                <Switch class="flex items-center gap-2 my-2" onChange={(isChecked) => setKeySymmetry(isChecked)} defaultChecked={keySymmetry()}>
-                    <SwitchControl>
-                        <SwitchThumb />
-                    </SwitchControl>
-                    <SwitchLabel>Key Symmetry</SwitchLabel>
-                </Switch>
+                <Show when={isKeySymmetrical()} fallback={"Key is not Symmetrical"}>
+                    Key is Symmetrical
+                </Show>
+
             </CardContent>
         </Card>
 
@@ -241,8 +291,8 @@ export function Shuffle() {
                             <For each={columnOrder()}>{(columnNumber, columnIndex) =>
                                 <th class="max-w-32">
                                     <div class="grid grid-cols-2">
-                                        <button classList={{"text-red-500 cursor-not-allowed": keySymmetry() && columnIndex() > columns/2}} onClick={() => (!(keySymmetry() && columnIndex() > columns/2)) && moveLeft(columnIndex())}>{"<"}</button>
-                                        <button classList={{"text-red-500 cursor-not-allowed": keySymmetry() && columnIndex() > columns/2}} onClick={() => (!(keySymmetry() && columnIndex() > columns/2)) && moveRight(columnIndex())}>{">"}</button>
+                                        <button onClick={() => moveLeft(columnIndex())}>{"<"}</button>
+                                        <button onClick={() => moveRight(columnIndex())}>{">"}</button>
                                     </div>
                                     <span>{columnNumber}</span>
                                 </th>
@@ -290,7 +340,20 @@ export function Shuffle() {
                 <BarChart data={chartData()} options={chartOptions} />
             </div>
         </div>
-
+        <Card>
+            <CardHeader class="pb-2 pt-5">
+                <CardTitle>ADFGVX Column Analysies</CardTitle>
+            </CardHeader>
+            <CardContent class="grid grid-cols-7 h-48">
+                <BasicFrequencyComparisonGraph alphabet={"ADFGVX".split("")} data1={() => getFrequenciesForADFGVXColumn(0)} data2={() => getAverageADFGVXColumnFrequencies()} />
+                <BasicFrequencyComparisonGraph alphabet={"ADFGVX".split("")} data1={() => getFrequenciesForADFGVXColumn(1)} data2={() => getAverageADFGVXColumnFrequencies()} />
+                <BasicFrequencyComparisonGraph alphabet={"ADFGVX".split("")} data1={() => getFrequenciesForADFGVXColumn(2)} data2={() => getAverageADFGVXColumnFrequencies()} />
+                <BasicFrequencyComparisonGraph alphabet={"ADFGVX".split("")} data1={() => getFrequenciesForADFGVXColumn(3)} data2={() => getAverageADFGVXColumnFrequencies()} />
+                <BasicFrequencyComparisonGraph alphabet={"ADFGVX".split("")} data1={() => getFrequenciesForADFGVXColumn(4)} data2={() => getAverageADFGVXColumnFrequencies()} />
+                <BasicFrequencyComparisonGraph alphabet={"ADFGVX".split("")} data1={() => getFrequenciesForADFGVXColumn(5)} data2={() => getAverageADFGVXColumnFrequencies()} />
+                <BasicFrequencyComparisonGraph alphabet={"ADFGVX".split("")} data1={() => getFrequenciesForADFGVXColumn(6)} data2={() => getAverageADFGVXColumnFrequencies()} />
+            </CardContent>
+        </Card>
 
         <Card>
             <CardHeader class="pb-2 pt-5">
@@ -303,7 +366,7 @@ export function Shuffle() {
                         <p class="break-all">{getNeedleResult()}</p>
                     </div>
                     <div>
-                        <p>ADFGVX ({getADFGVXResult().length})</p>
+                        <p>ADFGVX ({getADFGVXResult().length})  Bigrams: {Object.keys(countNGrams(getADFGVXResult(), 2)).length}</p>
                         <p class="break-all">{getADFGVXResult()}</p>
                     </div>
                     <div>
@@ -318,6 +381,111 @@ export function Shuffle() {
             </CardContent>
         </Card>
     </div>
+}
+
+function BasicFrequencyGraph({ alphabet, data }: { alphabet: string[], data: () => Record<string, number> }) {
+    const chartData: () => ChartData = () => ({
+        labels: alphabet,
+        datasets: [
+            {
+                label: "Frequencies",
+                data: alphabet.map((letter) => data()[letter]) ?? [],
+                yAxisID: "y"
+            }
+        ],
+    });
+    const chartOptions: ChartOptions = {
+        animation: false,
+        scales: {
+            "x": {
+                ticks: {
+                    padding: 10,
+                    autoSkip: false,
+                    font: {
+                        size: 12
+                    },
+                    maxRotation: 0,
+                    minRotation: 0,
+                }
+            },
+
+            y: {
+                position: "left",
+                ticks: {
+                    font: {
+                        size: 12
+                    },
+                    minRotation: 0
+                }
+            },
+            y1: {
+                position: "right",
+                ticks: {
+                    font: {
+                        size: 12
+                    },
+                    minRotation: 0
+                }
+            }
+        },
+    };
+
+    return <BarChart data={chartData()} options={chartOptions} />
+}
+
+function BasicFrequencyComparisonGraph({ alphabet, data1, data2 }: { alphabet: string[], data1: () => Record<string, number>, data2: () => Record<string, number> }) {
+    const chartData: () => ChartData = () => ({
+        labels: alphabet,
+        datasets: [
+            {
+                label: "data1",
+                data: alphabet.map((letter) => data1()[letter]) ?? [],
+                yAxisID: "y"
+            },
+            {
+                label: "data2",
+                data: alphabet.map((letter) => data2()[letter]) ?? [],
+                yAxisID: "y1"
+            }
+        ],
+    });
+    const chartOptions: ChartOptions = {
+        animation: false,
+        scales: {
+            "x": {
+                ticks: {
+                    padding: 10,
+                    autoSkip: false,
+                    font: {
+                        size: 12
+                    },
+                    maxRotation: 0,
+                    minRotation: 0,
+                }
+            },
+
+            y: {
+                position: "left",
+                ticks: {
+                    font: {
+                        size: 12
+                    },
+                    minRotation: 0
+                }
+            },
+            y1: {
+                position: "right",
+                ticks: {
+                    font: {
+                        size: 12
+                    },
+                    minRotation: 0
+                }
+            }
+        },
+    };
+
+    return <BarChart data={chartData()} options={chartOptions} />
 }
 
 function splitIntoGrams(text: string, ngramSize: number): string[] {
@@ -385,6 +553,17 @@ function countMonograms(text: string): Record<string, number> {
     }
 
     return monograms;
+}
+
+function countNGrams(text: string, n: number): Record<string, number> {
+    const nGrams: Record<string, number> = {};
+
+    for (let i = 0; i <= text.length - n; i++) {
+        const nGram = text.slice(i, i + n); // Extract n-gram of size n
+        nGrams[nGram] = (nGrams[nGram] || 0) + 1; // Count occurrences
+    }
+
+    return nGrams;
 }
 
 function panic() {
